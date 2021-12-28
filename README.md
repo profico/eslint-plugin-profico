@@ -1,36 +1,19 @@
-# ESLint plugin tutorial
+# ESLint plugin by Profico
 
-## What's this?
+This plugin is used to enforce some ESLint rules Profico developers use on a day-to-day basis.
+The following checklist shows what we have implemented and what we plan on implementing in the near future:
 
-This is an example repository to explain how to create your ESLint rules.
+- [x] Default import lodash modules instead of importing the whole library or parts of it:
 
-## Why should we learn how to create custom ESLint rules?
+```tsx
+// Bad
+import _ from "lodash"; // Not fixable
+import { get, pick } from "lodash"; // Fixable
 
-Lint rules help to keep our codes' quality constant. Automatic code checking brings time for more productive activities, and also eliminates indivisual effects from code review.
+// Good
+import get from "lodash/get";
+import pick from "lodash/pick";
+```
 
-Creating ESLint rules is a good subject to learn AST(Abstract Syntax Tree) analysis. Today, analysis of AST is the foundation of the JavaScript build ecosystem. There are many libraries using AST, such as Babel plugins, custom TypeScript transformers, prettier, webpack and so on. Your team's JavaScript gets improved significantly if you can control AST freely!
-
-## Tutorial
-
-[See guides](./guide/README.md).
-
-## Getting started
-
-This repository is also designed to work as a project template for custom ESLint rules.
-
-If you want to start quickly, follow the procedure below:
-
-- Clone this repository
-- Remove `.git` and `guide` dirs
-- Change pkg name via edit `package.json`
-- Change and test rule codes under `src/rules` dir
-
-This repository includes:
-
-- TypeScript setting
-- Jest
-- GitHub actions configuration
-
-## LICENSE
-
-MIT
+- [ ] Automatically sort import statements according to our style guide
+  > https://github.com/profico/react-boilerplate/blob/master/style-guide.md
