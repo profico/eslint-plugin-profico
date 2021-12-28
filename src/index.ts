@@ -1,6 +1,6 @@
 import lodashImports from "./rules/lodash-imports";
 
-export = {
+export default {
   rules: {
     "lodash-imports": lodashImports,
   },

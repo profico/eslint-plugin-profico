@@ -6,6 +6,7 @@ export const ERROR_MESSAGE =
 const noLodashNamedImports: Rule.RuleModule = {
   meta: {
     fixable: "code",
+    type: "problem",
   },
   create: context => ({
     ImportDeclaration: node => {
