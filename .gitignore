@@ -88,3 +88,5 @@ typings/
 
 lib/
 .DS_Store
+
+.npmrc

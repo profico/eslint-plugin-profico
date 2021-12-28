@@ -1,11 +1,14 @@
 {
   "name": "@profico/eslint-plugin-profico",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/profico/eslint-plugin-profico.git"
+  },
   "version": "1.0.0",
   "description": "ESLint plugin by Profico",
   "main": "lib/index.js",
   "scripts": {
     "prepare": "husky install",
-    "start-tutorial": "rimraf \"src/rules/**/*\" && rimraf src/index.ts && yarn remove @typescript-eslint/parser",
     "clean": "rimraf lib",
     "prebuild": "rimraf node_modules/@types/eslint/node_modules/@types/estree",
     "build": "tsc",
@@ -25,10 +28,11 @@
   "keywords": [
     "eslint",
     "typescript",
-    "example"
+    "profico",
+    "plugin"
   ],
   "author": "Filip Polić",
-  "license": "MIT",
+  "license": "ISC",
   "devDependencies": {
     "@types/eslint": "^8.2.1",
     "@types/estree": "^0.0.50",
