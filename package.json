@@ -2,7 +2,7 @@
   "name": "@profico/eslint-plugin-profico",
   "repository": {
     "type": "git",
-    "url": "git://github.com/profico/eslint-plugin-profico.git"
+    "url": "https://github.com/profico/eslint-plugin-profico.git"
   },
   "version": "1.0.0",
   "description": "ESLint plugin by Profico",
