@@ -1,7 +1,7 @@
 {
   "name": "@profico/eslint-plugin-profico",
   "version": "1.0.0",
-  "description": "Eslint plugin for Profico organization",
+  "description": "ESLint plugin by Profico",
   "main": "lib/index.js",
   "scripts": {
     "prepare": "husky install",
