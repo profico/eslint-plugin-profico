@@ -25,7 +25,7 @@
     "typescript",
     "example"
   ],
-  "author": "Quramy",
+  "author": "Filip Polić",
   "license": "MIT",
   "devDependencies": {
     "@types/eslint": "^8.2.1",
