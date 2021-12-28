@@ -8,10 +8,10 @@
     "clean": "rimraf lib",
     "prebuild": "rimraf node_modules/@types/eslint/node_modules/@types/estree",
     "build": "tsc",
-    "prettier": "prettier \"*.{js,json,yml,yaml,md}\" \"src/**/*\" \"guide/**/*\"",
+    "prettier": "prettier \"*.{js,json,yml,yaml,md}\" \"src/**/*\"",
     "format": "yarn prettier --write",
     "format:check": "yarn prettier --check",
-    "test": "jest",
+    "test": "jest --watchAll",
     "prepublish": "npm run clean && npm run build"
   },
   "files": [
