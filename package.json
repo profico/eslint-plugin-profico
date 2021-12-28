@@ -1,0 +1,67 @@
+{
+  "name": "@profico/eslint-plugin-profico",
+  "version": "1.0.0",
+  "description": "Eslint plugin for Profico organization",
+  "main": "lib/index.js",
+  "scripts": {
+    "start-tutorial": "rimraf \"src/rules/**/*\" && rimraf src/index.ts && npm un @typescript-eslint/parser",
+    "clean": "rimraf lib",
+    "prebuild": "rimraf node_modules/@types/eslint/node_modules/@types/estree",
+    "build": "tsc",
+    "prettier": "prettier \"*.{js,json,yml,yaml,md}\" \"src/**/*\" \"guide/**/*\"",
+    "format": "yarn prettier --write",
+    "format:check": "yarn prettier --check",
+    "test": "jest",
+    "prepublish": "npm run clean && npm run build"
+  },
+  "files": [
+    "README.md",
+    "package.json",
+    "lib"
+  ],
+  "keywords": [
+    "eslint",
+    "typescript",
+    "example"
+  ],
+  "author": "Quramy",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/eslint": "7.28.1",
+    "@types/estree": "0.0.50",
+    "@types/node": "16.11.9",
+    "@typescript-eslint/parser": "5.4.0",
+    "eslint": "8.0.1",
+    "husky": "4.3.8",
+    "jest": "27.3.1",
+    "prettier": "2.4.1",
+    "pretty-quick": "3.1.2",
+    "rimraf": "3.0.2",
+    "ts-jest": "27.1.1",
+    "typescript": "4.5.3"
+  },
+  "peerDependencies": {
+    "eslint": "^4.0.0 || ^5.0.0 || ^6.0.0 || ^7.0.0 || ^8.0.0"
+  },
+  "jest": {
+    "globals": {
+      "ts-jest": {
+        "diagnostics": false
+      }
+    },
+    "transform": {
+      "^.+\\.ts$": "ts-jest"
+    },
+    "testRegex": "(src/.*\\.test)\\.ts$",
+    "testPathIgnorePatterns": [
+      "/node_modules/",
+      "\\.d\\.ts$",
+      "lib/.*"
+    ],
+    "moduleFileExtensions": [
+      "js",
+      "ts",
+      "json"
+    ]
+  }
+}
