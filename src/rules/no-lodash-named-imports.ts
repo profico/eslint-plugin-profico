@@ -11,7 +11,10 @@ const noLodashNamedImports: Rule.RuleModule = {
     ImportDeclaration: node => {
       const { source, specifiers, loc } = node;
 
-      if (source.value === "lodash" && specifiers.find(spec => spec.type === "ImportSpecifier")) {
+      if (
+        source.value === "lodash" &&
+        specifiers.find(spec => spec.type === "ImportSpecifier")
+      ) {
         context.report({
           node,
           // loc: loc || {
@@ -22,7 +25,12 @@ const noLodashNamedImports: Rule.RuleModule = {
           fix: fixer =>
             fixer.replaceText(
               node,
-              specifiers.map(spec => `import ${spec.local.name} from 'lodash/${spec.local.name}';`).join("\n"),
+              specifiers
+                .map(
+                  spec =>
+                    `import ${spec.local.name} from 'lodash/${spec.local.name}';`,
+                )
+                .join("\n"),
             ),
         });
       }

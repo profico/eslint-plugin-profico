@@ -10,7 +10,10 @@ const tester = new RuleTester({
 });
 
 tester.run("no-lodash-named-imports", noLodashNamedImports, {
-  valid: ["import pick from 'lodash/pick';", "import pick from 'lodash/pick';\n\"import get from 'lodash/get';\""],
+  valid: [
+    "import pick from 'lodash/pick';",
+    "import pick from 'lodash/pick';\n\"import get from 'lodash/get';\"",
+  ],
   invalid: [
     {
       code: "import { pick } from 'lodash';",

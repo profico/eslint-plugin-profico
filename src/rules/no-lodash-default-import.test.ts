@@ -1,6 +1,8 @@
 import { RuleTester } from "eslint";
 
-import noLodashDefaultImport, { ERROR_MESSAGE } from "./no-lodash-default-import";
+import noLodashDefaultImport, {
+  ERROR_MESSAGE,
+} from "./no-lodash-default-import";
 
 const tester = new RuleTester({
   parserOptions: {
