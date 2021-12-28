@@ -1,8 +1,7 @@
-import noLodashNamedImports from "./rules/no-lodash-named-imports";
+import lodashImports from "./rules/lodash-imports";
 
 export = {
   rules: {
-    "no-lodash-default-import": noLodashNamedImports,
-    "no-lodash-named-imports": noLodashNamedImports,
+    "lodash-imports": lodashImports,
   },
 };
