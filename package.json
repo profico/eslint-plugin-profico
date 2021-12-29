@@ -1,5 +1,5 @@
 {
-  "name": "@profico/eslint-plugin-profico",
+  "name": "@profico/eslint-plugin",
   "repository": {
     "type": "git",
     "url": "https://github.com/profico/eslint-plugin-profico.git"
@@ -21,6 +21,7 @@
     "prepublish": "yarn run clean && yarn run build"
   },
   "files": [
+    "LICENSE",
     "README.md",
     "package.json",
     "lib"
@@ -35,7 +36,7 @@
     "name": "Filip Polić",
     "email": "fpolic@profico.hr"
   },
-  "license": "ISC",
+  "license": "MIT",
   "devDependencies": {
     "@types/eslint": "^8.2.1",
     "@types/estree": "^0.0.50",

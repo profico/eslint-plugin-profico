@@ -1,9 +1,9 @@
 import { Linter } from "eslint";
 
 const recommended: Linter.Config = {
-  plugins: ["profico"],
+  plugins: ["@profico"],
   rules: {
-    "profico/lodash-imports": ["error"],
+    "@profico/lodash-imports": ["error"],
   },
   parserOptions: {
     ecmaVersion: 2015,
