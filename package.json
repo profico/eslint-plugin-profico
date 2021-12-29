@@ -31,7 +31,10 @@
     "profico",
     "plugin"
   ],
-  "author": "Filip Polić",
+  "author": {
+    "name": "Filip Polić",
+    "email": "fpolic@profico.hr"
+  },
   "license": "ISC",
   "devDependencies": {
     "@types/eslint": "^8.2.1",
