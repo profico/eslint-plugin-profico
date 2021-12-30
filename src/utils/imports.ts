@@ -140,3 +140,26 @@ export const insertEmptyLineBetweenNamedAndDefaultImports = (
     }
   }
 };
+
+export const insertStylesImportsAtTheEnd = (
+  context: Rule.RuleContext,
+  stylesDeclarations: ImportDeclaration[],
+  lastImportDeclaration: ImportDeclaration,
+): void => {
+  stylesDeclarations.forEach(declaration => {
+    context.report({
+      message: SortedImportsMessages.STYLES_AT_END,
+      loc: getSourceLocation(declaration.loc),
+      node: declaration,
+      fix: fixer => {
+        return [
+          fixer.insertTextAfter(
+            lastImportDeclaration,
+            `\n\n${getImportStatement(declaration)}`,
+          ),
+          fixer.remove(declaration),
+        ];
+      },
+    });
+  });
+};

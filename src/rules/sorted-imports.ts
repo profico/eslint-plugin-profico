@@ -8,6 +8,7 @@ import {
   moveNamedAfterDefaultImports,
   insertEmptyLineBetweenNamedAndDefaultImports,
   isStylesImport,
+  insertStylesImportsAtTheEnd,
 } from "../utils/imports";
 import { SortedImportsMessages } from "../utils/messages";
 
@@ -22,7 +23,7 @@ const sortedImports: Rule.RuleModule = {
       const importDeclarations = body.filter(
         value => value.type === "ImportDeclaration",
       ) as ImportDeclaration[];
-      let stylesDeclaration: ImportDeclaration | undefined;
+      const stylesDeclarations: ImportDeclaration[] = [];
 
       importDeclarations.forEach((currentDeclaration, index) => {
         const prevDeclaration: ImportDeclaration | undefined =
@@ -33,7 +34,7 @@ const sortedImports: Rule.RuleModule = {
         }
 
         if (isStylesImport(prevDeclaration)) {
-          stylesDeclaration = { ...prevDeclaration };
+          stylesDeclarations.push(prevDeclaration);
         }
 
         moveRelativeAfterAbsoluteImports(
@@ -55,29 +56,11 @@ const sortedImports: Rule.RuleModule = {
         );
       });
 
-      if (stylesDeclaration) {
-        context.report({
-          message: SortedImportsMessages.STYLES_AT_END,
-          loc: getSourceLocation(stylesDeclaration.loc),
-          node: stylesDeclaration,
-          fix: fixer => {
-            if (!stylesDeclaration) {
-              return null;
-            }
-
-            const lastImport =
-              importDeclarations[importDeclarations.length - 1];
-
-            return [
-              fixer.insertTextAfter(
-                lastImport,
-                `\n\n${getImportStatement(stylesDeclaration)}`,
-              ),
-              fixer.remove(stylesDeclaration),
-            ];
-          },
-        });
-      }
+      insertStylesImportsAtTheEnd(
+        context,
+        stylesDeclarations,
+        importDeclarations[importDeclarations.length - 1],
+      );
     },
   }),
 };
