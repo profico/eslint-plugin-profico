@@ -1,16 +1,13 @@
 import { Rule } from "eslint";
-import { ImportDeclaration } from "estree";
+import { ImportDeclaration, Program } from "estree";
 
 import {
-  getSourceLocation,
-  getImportStatement,
   moveRelativeAfterAbsoluteImports,
   moveNamedAfterDefaultImports,
   insertEmptyLineBetweenNamedAndDefaultImports,
   isStylesImport,
   insertStylesImportsAtTheEnd,
 } from "../utils/imports";
-import { SortedImportsMessages } from "../utils/messages";
 
 const sortedImports: Rule.RuleModule = {
   meta: {
