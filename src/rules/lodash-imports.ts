@@ -1,7 +1,6 @@
 import { Rule } from "eslint";
 
-export const ERROR_MESSAGE =
-  "Use default imports from lodash modules to reduce the bundle size. E.g. `import pick from 'lodash/pick';`";
+import { LodashImportsMessages } from "../utils/messages";
 
 const noLodashNamedImports: Rule.RuleModule = {
   meta: {
@@ -16,7 +15,7 @@ const noLodashNamedImports: Rule.RuleModule = {
         if (specifiers.find(spec => spec.type === "ImportDefaultSpecifier")) {
           context.report({
             node,
-            message: ERROR_MESSAGE,
+            message: LodashImportsMessages.DEFAULT_MESSAGE,
           });
         }
 
@@ -27,7 +26,7 @@ const noLodashNamedImports: Rule.RuleModule = {
               start: { column: 0, line: 0 },
               end: { column: 0, line: 0 },
             },
-            message: ERROR_MESSAGE,
+            message: LodashImportsMessages.DEFAULT_MESSAGE,
             fix: fixer =>
               fixer.replaceText(
                 node,
