@@ -1,11 +1,13 @@
 import { Rule } from "eslint";
 
-import { LodashImportsMessages } from "../utils/messages";
-
-const noLodashNamedImports: Rule.RuleModule = {
+const lodashImports: Rule.RuleModule = {
   meta: {
     fixable: "code",
     type: "problem",
+    messages: {
+      invalidImport:
+        "Use default imports from lodash modules to reduce the bundle size. E.g. `import pick from 'lodash/pick';`",
+    },
   },
   create: context => ({
     ImportDeclaration: node => {
@@ -15,7 +17,7 @@ const noLodashNamedImports: Rule.RuleModule = {
         if (specifiers.find(spec => spec.type === "ImportDefaultSpecifier")) {
           context.report({
             node,
-            message: LodashImportsMessages.DEFAULT_MESSAGE,
+            messageId: "invalidImport",
           });
         }
 
@@ -26,7 +28,7 @@ const noLodashNamedImports: Rule.RuleModule = {
               start: { column: 0, line: 0 },
               end: { column: 0, line: 0 },
             },
-            message: LodashImportsMessages.DEFAULT_MESSAGE,
+            messageId: "invalidImport",
             fix: fixer =>
               fixer.replaceText(
                 node,
@@ -45,4 +47,4 @@ const noLodashNamedImports: Rule.RuleModule = {
   }),
 };
 
-export default noLodashNamedImports;
+export default lodashImports;

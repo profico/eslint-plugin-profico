@@ -1,165 +1,262 @@
 import { Rule } from "eslint";
-import { ImportDeclaration, SourceLocation } from "estree";
+import {
+  ImportDeclaration,
+  ImportDefaultSpecifier,
+  ImportNamespaceSpecifier,
+  Node,
+} from "estree";
 
-import { SortedImportsMessages } from "./messages";
+type SortedImportsResult = {
+  start: number;
+  end: number;
+  text: string;
+};
+type ImportGroup = Record<
+  "namespace" | "default" | "named",
+  ImportDeclaration[]
+>;
+type DividerType = Record<"type" | "value", string>;
 
-export const getSourceLocation = (
-  defaultLoc?: SourceLocation | null,
-): SourceLocation =>
-  defaultLoc || {
-    start: {
-      column: 0,
-      line: 0,
-    },
-    end: {
-      column: 0,
-      line: 0,
-    },
-  };
+function isImportDeclaration(node: Node): node is ImportDeclaration {
+  return node.type === "ImportDeclaration";
+}
 
-const getSourceValue = (declaration: ImportDeclaration): string =>
-  declaration.source.value?.toString() || "";
+function getImportSourceValue(declaration: ImportDeclaration): string {
+  return declaration.source.value?.toString() || "";
+}
 
-const isRelativeImport = (declaration: ImportDeclaration): boolean =>
-  getSourceValue(declaration).includes("./");
+function isRelativeImport(declaration: ImportDeclaration): boolean {
+  return getImportSourceValue(declaration).includes("./");
+}
 
-const isDefaultImport = (declaration: ImportDeclaration): boolean =>
-  declaration.specifiers[0].type === "ImportDefaultSpecifier";
+function isAbsoluteImport(declaration: ImportDeclaration): boolean {
+  return !isRelativeImport(declaration);
+}
 
-export const isStylesImport = (declaration: ImportDeclaration): boolean => {
-  const sourceValue = getSourceValue(declaration);
+function isDefaultImport(node: Node): node is ImportDefaultSpecifier {
+  return (
+    "specifiers" in node &&
+    node.specifiers.length > 0 &&
+    node.specifiers[0].type === "ImportDefaultSpecifier"
+  );
+}
+
+function isNamespaceImport(node: Node): node is ImportNamespaceSpecifier {
+  return (
+    "specifiers" in node &&
+    node.specifiers.length > 0 &&
+    node.specifiers[0].type === "ImportNamespaceSpecifier"
+  );
+}
+
+function isGlobalImport({ specifiers }: ImportDeclaration): boolean {
+  return specifiers.length === 0;
+}
+
+function isStylesImport(declaration: ImportDeclaration): boolean {
+  const sourceValue = getImportSourceValue(declaration);
 
   return (
     sourceValue.endsWith("css") ||
+    sourceValue.endsWith("sass") ||
+    sourceValue.endsWith("less") ||
     sourceValue.endsWith(".style.ts") ||
     sourceValue.endsWith(".style.js")
   );
-};
+}
 
-export const getImportStatement = ({
-  source,
-  specifiers,
-}: ImportDeclaration): string => {
-  const firstSpecifier = specifiers[0];
-  const hasDefaultImport = firstSpecifier.type === "ImportDefaultSpecifier";
-  const imports: string[] = specifiers
-    .slice(hasDefaultImport ? 1 : 0)
-    .map(spec => spec.local.name);
-  const importKeyword: string = `import${
-    hasDefaultImport ? ` ${firstSpecifier.local.name}` : ""
-  }`;
-  const namedImports = `{ ${imports.join(", ")} }`;
-  const importedVariables: string =
-    imports.length > 0
-      ? `${hasDefaultImport ? ", " : ""}${
-          !hasDefaultImport ? " " : ""
-        }${namedImports}`
-      : "";
+// Mainly used with 'use strict' statements
+function isPossibleDirective(node: Node): boolean {
+  return (
+    node.type === "ExpressionStatement" &&
+    node.expression.type === "Literal" &&
+    typeof node.expression.value === "string"
+  );
+}
 
-  return `${importKeyword}${importedVariables} from '${source.value}';`;
-};
+const SortResult = {
+  SAME: 0,
+  AFTER: 1,
+  BEFORE: -1,
+} as const;
 
-export const moveRelativeAfterAbsoluteImports = (
-  context: Rule.RuleContext,
-  prevDeclaration: ImportDeclaration,
-  currentDeclaration: ImportDeclaration,
-): void => {
-  if (
-    isRelativeImport(prevDeclaration) &&
-    !isRelativeImport(currentDeclaration)
-  ) {
-    context.report({
-      message: SortedImportsMessages.RELATIVE_AFTER_ABSOLUTE,
-      loc: getSourceLocation(prevDeclaration.loc),
-      node: prevDeclaration,
-      fix: fixer => [
-        fixer.replaceText(
-          prevDeclaration,
-          getImportStatement(currentDeclaration),
-        ),
-        fixer.replaceText(
-          currentDeclaration,
-          getImportStatement(prevDeclaration),
-        ),
-      ],
-    });
+function getGroupChunk(group: ImportGroup, declaration: ImportDeclaration) {
+  if (isNamespaceImport(declaration)) {
+    return group.namespace;
   }
+
+  return isDefaultImport(declaration) ? group.default : group.named;
+}
+
+const divider: DividerType = {
+  type: "Divider",
+  value: "",
 };
 
-export const moveNamedAfterDefaultImports = (
-  context: Rule.RuleContext,
-  prevDeclaration: ImportDeclaration,
-  currentDeclaration: ImportDeclaration,
-): void => {
-  if (
-    !isDefaultImport(prevDeclaration) &&
-    isDefaultImport(currentDeclaration) &&
-    !isRelativeImport(currentDeclaration)
-  ) {
-    context.report({
-      message: SortedImportsMessages.NAMED_AFTER_DEFAULT,
-      loc: getSourceLocation(prevDeclaration.loc),
-      node: prevDeclaration,
-      fix: fixer => [
-        fixer.replaceText(
-          prevDeclaration,
-          getImportStatement(currentDeclaration),
-        ),
-        fixer.replaceText(
-          currentDeclaration,
-          getImportStatement(prevDeclaration),
-        ),
-      ],
-    });
-  }
-};
+function isDivider(node: Node | DividerType): node is DividerType {
+  return node.type === "Divider";
+}
 
-export const insertEmptyLineBetweenNamedAndDefaultImports = (
-  context: Rule.RuleContext,
-  prevDeclaration: ImportDeclaration,
-  currentDeclaration: ImportDeclaration,
-): void => {
-  if (
-    (isDefaultImport(prevDeclaration) &&
-      !isDefaultImport(currentDeclaration)) ||
-    (!isDefaultImport(prevDeclaration) && isDefaultImport(currentDeclaration))
-  ) {
-    const prevSourceLocation = getSourceLocation(prevDeclaration.loc);
-    const currentSourceLocation = getSourceLocation(currentDeclaration.loc);
+function makeGroup(
+  group: (Node | ImportDeclaration)[],
+): (Node | ImportDeclaration | DividerType)[] {
+  return group.length > 0 ? [...group, divider] : [];
+}
 
-    if (
-      currentSourceLocation.start.line - prevSourceLocation.start.line ===
-      1
-    ) {
-      context.report({
-        message: SortedImportsMessages.LINE_BETWEEN_DEFAULT_AND_NAMED,
-        loc: getSourceLocation(currentDeclaration.loc),
-        node: currentDeclaration,
-        fix: fixer => fixer.insertTextAfter(prevDeclaration, "\n"),
-      });
+function findLastIndex<T>(
+  array: Array<T>,
+  predicate: (value: T, index: number, obj: T[]) => boolean,
+): number {
+  let l = array.length;
+
+  while (l--) {
+    if (predicate(array[l], l, array)) {
+      return l;
     }
   }
-};
 
-export const insertStylesImportsAtTheEnd = (
+  return -1;
+}
+
+export function getSortedImports(
   context: Rule.RuleContext,
-  stylesDeclarations: ImportDeclaration[],
-  lastImportDeclaration: ImportDeclaration,
-): void => {
-  stylesDeclarations.forEach(declaration => {
-    context.report({
-      message: SortedImportsMessages.STYLES_AT_END,
-      loc: getSourceLocation(declaration.loc),
-      node: declaration,
-      fix: fixer => {
-        return [
-          fixer.insertTextAfter(
-            lastImportDeclaration,
-            `\n\n${getImportStatement(declaration)}`,
-          ),
-          fixer.remove(declaration),
-        ];
-      },
-    });
+  body: Node[],
+): SortedImportsResult {
+  const startIndex = body.findIndex(
+    node => isPossibleDirective(node) || isImportDeclaration(node),
+  );
+  const endIndex = findLastIndex(
+    body,
+    node => isPossibleDirective(node) || isImportDeclaration(node),
+  );
+  const nodesToSort = [...body].slice(startIndex, endIndex + 1);
+
+  const sorted: Node[] = [...nodesToSort].sort((current, prev) => {
+    if (
+      // Move directives like `use strict;` to the top of the file
+      (!isPossibleDirective(prev) && isPossibleDirective(current)) ||
+      // Move import declarations to top, right after directives
+      (!isImportDeclaration(prev) && isImportDeclaration(current))
+    ) {
+      return SortResult.BEFORE;
+    }
+
+    // Bail if both nodes aren't import declarations
+    if (!isImportDeclaration(prev) || !isImportDeclaration(current)) {
+      return SortResult.SAME;
+    }
+
+    if (
+      // Move global imports to the start of import declarations
+      (!isGlobalImport(prev) && isGlobalImport(current)) ||
+      // Move relative imports after absolute imports
+      // i.e. sort between relative/absolute groups
+      (isRelativeImport(prev) && isAbsoluteImport(current))
+    ) {
+      return SortResult.BEFORE;
+    }
+
+    // Sort inside relative/absolute groups
+    if (
+      (isAbsoluteImport(prev) && isAbsoluteImport(current)) ||
+      (isRelativeImport(prev) && isRelativeImport(current))
+    ) {
+      if (isNamespaceImport(prev)) {
+        return SortResult.SAME;
+      }
+
+      if (
+        (isGlobalImport(prev) || !isAbsoluteImport(prev)) &&
+        !isRelativeImport(prev)
+      ) {
+        return SortResult.SAME;
+      }
+
+      // Move default imports after namespace imports
+      if (isDefaultImport(prev) && isNamespaceImport(current)) {
+        return SortResult.BEFORE;
+      }
+
+      if (isStylesImport(current)) {
+        return SortResult.SAME;
+      }
+
+      // Sort named imports after default imports
+      if (!isDefaultImport(prev) && isDefaultImport(current)) {
+        return SortResult.BEFORE;
+      }
+    }
+
+    // Sort styles imports to the bottom of import declarations
+    if (isStylesImport(prev) && !isStylesImport(current)) {
+      return SortResult.BEFORE;
+    }
+
+    return SortResult.SAME;
   });
-};
+
+  const directives: Node[] = [];
+  const globalImports: ImportDeclaration[] = [];
+  const absoluteImportsGroup: ImportGroup = {
+    namespace: [],
+    default: [],
+    named: [],
+  };
+  const relativeImportsGroup: ImportGroup = {
+    namespace: [],
+    default: [],
+    named: [],
+  };
+  const stylesImports: ImportDeclaration[] = [];
+  const restOfNodes: ImportDeclaration[] = [];
+
+  sorted.forEach(node => {
+    let targetGroup: (ImportDeclaration | Node)[] = restOfNodes;
+
+    if (isPossibleDirective(node)) {
+      targetGroup = directives;
+    }
+
+    // Only group import declarations from now on
+    if (isImportDeclaration(node)) {
+      if (isGlobalImport(node)) {
+        targetGroup = globalImports;
+      } else if (isStylesImport(node)) {
+        targetGroup = stylesImports;
+      } else {
+        targetGroup = getGroupChunk(
+          isAbsoluteImport(node) ? absoluteImportsGroup : relativeImportsGroup,
+          node,
+        );
+      }
+    }
+
+    targetGroup.push(node);
+  });
+
+  const grouped: ReturnType<typeof makeGroup> = [
+    ...makeGroup(directives),
+    ...makeGroup(globalImports),
+    ...makeGroup(absoluteImportsGroup.namespace),
+    ...makeGroup(absoluteImportsGroup.default),
+    ...makeGroup(absoluteImportsGroup.named),
+    ...makeGroup(relativeImportsGroup.namespace),
+    ...makeGroup(relativeImportsGroup.default),
+    ...makeGroup(relativeImportsGroup.named),
+    ...makeGroup(stylesImports),
+    ...restOfNodes,
+  ];
+
+  const firstImportNode = nodesToSort[0];
+  const lastImportNode = nodesToSort[nodesToSort.length - 1];
+
+  return {
+    text: grouped
+      .map(node =>
+        isDivider(node) ? node.value : context.getSourceCode().getText(node),
+      )
+      .join("\n"),
+    start: firstImportNode.range ? firstImportNode.range[0] : 0,
+    end: lastImportNode.range ? lastImportNode.range[1] : 0,
+  };
+}
