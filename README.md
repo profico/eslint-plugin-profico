@@ -29,12 +29,15 @@ To use the recommended rules, add our plugin to your `.eslintrc` file:
 {
   "plugins": ["@profico"],
   "rules": {
-    "@profico/lodash-imports": ["error"]
+    "@profico/lodash-imports": ["error"],
+    "@profico/sorted-imports": ["error"],
   }
 }
 ```
 
 The following checklist shows what we have implemented and what we plan on implementing in the near future:
+
+### <a name="lodash-imports">lodash-imports</a>
 
 - [x] Default import lodash modules instead of importing the whole library or parts of it:
 
@@ -47,6 +50,8 @@ import { get, pick } from "lodash"; // Fixable
 import get from "lodash/get";
 import pick from "lodash/pick";
 ```
+
+### <a name="sorted-imports">sorted-imports</a>
 
 - [ ] Automatically sort import statements according to our style guide:
       https://github.com/profico/react-boilerplate/blob/master/style-guide.md
