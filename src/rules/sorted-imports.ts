@@ -10,6 +10,9 @@ const sortedImports: Rule.RuleModule = {
       improperlySorted:
         "Import declarations are not sorted according to Profico's React Style Guide. Run autofix to sort them.",
     },
+    docs: {
+      url: "https://github.com/profico/eslint-plugin-profico#sorted-imports",
+    },
   },
   create: context => {
     return {

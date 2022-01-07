@@ -8,6 +8,9 @@ const lodashImports: Rule.RuleModule = {
       invalidImport:
         "Use default imports from lodash modules to reduce the bundle size. E.g. `import pick from 'lodash/pick';`",
     },
+    docs: {
+      url: "https://github.com/profico/eslint-plugin-profico#lodash-imports",
+    },
   },
   create: context => ({
     ImportDeclaration: node => {
