@@ -1,0 +1,17 @@
+'use strict';
+
+import 'global';
+
+import * as NS from "namespace";
+
+import React from "react";
+
+import { Named } from "named";
+
+import * as Local from "./local";
+
+import DefaultLocal from './default-local.ts';
+
+import { NamedLocal } from './named-local.ts';
+
+import { styles } from "./style.ts";

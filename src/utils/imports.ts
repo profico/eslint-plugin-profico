@@ -67,8 +67,7 @@ function isStylesImport(declaration: ImportDeclaration): boolean {
     sourceValue.endsWith("css") ||
     sourceValue.endsWith("sass") ||
     sourceValue.endsWith("less") ||
-    sourceValue.endsWith(".style.ts") ||
-    sourceValue.endsWith(".style.js")
+    sourceValue.includes("style")
   );
 }
 
@@ -142,70 +141,6 @@ export function getSortedImports(
   );
   const nodesToSort = [...body].slice(startIndex, endIndex + 1);
 
-  const sorted: Node[] = [...nodesToSort].sort((current, prev) => {
-    if (
-      // Move directives like `use strict;` to the top of the file
-      (!isPossibleDirective(prev) && isPossibleDirective(current)) ||
-      // Move import declarations to top, right after directives
-      (!isImportDeclaration(prev) && isImportDeclaration(current))
-    ) {
-      return SortResult.BEFORE;
-    }
-
-    // Bail if both nodes aren't import declarations
-    if (!isImportDeclaration(prev) || !isImportDeclaration(current)) {
-      return SortResult.SAME;
-    }
-
-    if (
-      // Move global imports to the start of import declarations
-      (!isGlobalImport(prev) && isGlobalImport(current)) ||
-      // Move relative imports after absolute imports
-      // i.e. sort between relative/absolute groups
-      (isRelativeImport(prev) && isAbsoluteImport(current))
-    ) {
-      return SortResult.BEFORE;
-    }
-
-    // Sort inside relative/absolute groups
-    if (
-      (isAbsoluteImport(prev) && isAbsoluteImport(current)) ||
-      (isRelativeImport(prev) && isRelativeImport(current))
-    ) {
-      if (isNamespaceImport(prev)) {
-        return SortResult.SAME;
-      }
-
-      if (
-        (isGlobalImport(prev) || !isAbsoluteImport(prev)) &&
-        !isRelativeImport(prev)
-      ) {
-        return SortResult.SAME;
-      }
-
-      // Move default imports after namespace imports
-      if (isDefaultImport(prev) && isNamespaceImport(current)) {
-        return SortResult.BEFORE;
-      }
-
-      if (isStylesImport(current)) {
-        return SortResult.SAME;
-      }
-
-      // Sort named imports after default imports
-      if (!isDefaultImport(prev) && isDefaultImport(current)) {
-        return SortResult.BEFORE;
-      }
-    }
-
-    // Sort styles imports to the bottom of import declarations
-    if (isStylesImport(prev) && !isStylesImport(current)) {
-      return SortResult.BEFORE;
-    }
-
-    return SortResult.SAME;
-  });
-
   const directives: Node[] = [];
   const globalImports: ImportDeclaration[] = [];
   const absoluteImportsGroup: ImportGroup = {
@@ -221,15 +156,13 @@ export function getSortedImports(
   const stylesImports: ImportDeclaration[] = [];
   const restOfNodes: ImportDeclaration[] = [];
 
-  sorted.forEach(node => {
+  nodesToSort.forEach(node => {
     let targetGroup: (ImportDeclaration | Node)[] = restOfNodes;
 
     if (isPossibleDirective(node)) {
       targetGroup = directives;
-    }
-
-    // Only group import declarations from now on
-    if (isImportDeclaration(node)) {
+    } else if (isImportDeclaration(node)) {
+      // Only group import declarations from now on
       if (isGlobalImport(node)) {
         targetGroup = globalImports;
       } else if (isStylesImport(node)) {
@@ -260,13 +193,12 @@ export function getSortedImports(
 
   const firstImportNode = nodesToSort[0];
   const lastImportNode = nodesToSort[nodesToSort.length - 1];
+  const sourceCode = context.getSourceCode();
 
   return {
     text: grouped
       .map(node =>
-        isDivider(node)
-          ? node.value
-          : context.getSourceCode().getText(node).trim(),
+        isDivider(node) ? node.value : sourceCode.getText(node).trim(),
       )
       .join("\n")
       .trim(),

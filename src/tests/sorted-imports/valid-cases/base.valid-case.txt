@@ -1,0 +1,6 @@
+import { Paper } from "@components";
+import { pick } from "lodash";
+
+import Default from "./Default";
+
+import styles from "./styles.module.scss";

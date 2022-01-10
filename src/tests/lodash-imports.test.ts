@@ -1,6 +1,6 @@
 import { RuleTester } from "eslint";
 
-import lodashImports from "./lodash-imports";
+import lodashImports from "../rules/lodash-imports";
 
 const tester = new RuleTester({
   parserOptions: {

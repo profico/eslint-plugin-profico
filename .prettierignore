@@ -3,3 +3,4 @@ __snapshots__/
 coverage/
 node_modules/
 *.png
+*.txt

@@ -1,0 +1,8 @@
+import * as NS from "namespace";
+
+import React from "react";
+
+import { Named } from "./named";
+import { Local } from "./local";
+
+import { styles } from "./style.ts";
