@@ -33,11 +33,18 @@ function isAbsoluteImport(declaration: ImportDeclaration): boolean {
   return !isRelativeImport(declaration);
 }
 
-function isDefaultImport(node: Node): node is ImportDefaultSpecifier {
+export function isDefaultImport(node: Node): node is ImportDefaultSpecifier {
   return (
     "specifiers" in node &&
     node.specifiers.length > 0 &&
     node.specifiers[0].type === "ImportDefaultSpecifier"
+  );
+}
+
+export function hasNamedImports(declaration: ImportDeclaration): boolean {
+  return (
+    declaration.specifiers.find(node => node.type === "ImportSpecifier") !==
+    undefined
   );
 }
 

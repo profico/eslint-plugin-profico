@@ -27,11 +27,14 @@ tester.run("lodash-imports", lodashImports, {
     },
     {
       code: "import _ from 'lodash';",
-      errors: [{ messageId: "invalidImport" }],
+      errors: [{ messageId: "noUnderscoreImport" }],
     },
     {
       code: "import _, { get, pick } from 'lodash';",
-      errors: [{ messageId: "invalidImport" }, { messageId: "invalidImport" }],
+      errors: [
+        { messageId: "noUnderscoreImport" },
+        { messageId: "invalidImport" },
+      ],
       output:
         "import _ from 'lodash';\nimport get from 'lodash/get';\nimport pick from 'lodash/pick';",
     },

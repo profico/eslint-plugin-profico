@@ -1,5 +1,7 @@
 import { Rule } from "eslint";
 
+import { hasNamedImports, isDefaultImport } from "../utils/imports";
+
 const lodashImports: Rule.RuleModule = {
   meta: {
     fixable: "code",
@@ -7,6 +9,8 @@ const lodashImports: Rule.RuleModule = {
     messages: {
       invalidImport:
         "Use default imports from lodash modules to reduce the bundle size. E.g. `import pick from 'lodash/pick';`",
+      noUnderscoreImport:
+        "Don't import the full `lodash` package. Import separate modules to reduce the bundle size.",
     },
     docs: {
       url: "https://github.com/profico/eslint-plugin-profico#lodash-imports",
@@ -16,35 +20,37 @@ const lodashImports: Rule.RuleModule = {
     ImportDeclaration: node => {
       const { source, specifiers, loc } = node;
 
-      if (source.value === "lodash") {
-        if (specifiers.find(spec => spec.type === "ImportDefaultSpecifier")) {
-          context.report({
-            node,
-            messageId: "invalidImport",
-          });
-        }
+      if (source.value !== "lodash") {
+        return null;
+      }
 
-        if (specifiers.find(spec => spec.type === "ImportSpecifier")) {
-          context.report({
-            node,
-            loc: loc || {
-              start: { column: 0, line: 0 },
-              end: { column: 0, line: 0 },
-            },
-            messageId: "invalidImport",
-            fix: fixer =>
-              fixer.replaceText(
-                node,
-                specifiers
-                  .map(spec =>
-                    spec.type === "ImportSpecifier"
-                      ? `import ${spec.local.name} from 'lodash/${spec.local.name}';`
-                      : `import ${spec.local.name} from 'lodash';`,
-                  )
-                  .join("\n"),
-              ),
-          });
-        }
+      if (isDefaultImport(node)) {
+        context.report({
+          node,
+          messageId: "noUnderscoreImport",
+        });
+      }
+
+      if (hasNamedImports(node)) {
+        context.report({
+          node,
+          loc: loc || {
+            start: { column: 0, line: 0 },
+            end: { column: 0, line: 0 },
+          },
+          messageId: "invalidImport",
+          fix: fixer =>
+            fixer.replaceText(
+              node,
+              specifiers
+                .map(spec =>
+                  spec.type === "ImportSpecifier"
+                    ? `import ${spec.local.name} from 'lodash/${spec.local.name}';`
+                    : `import ${spec.local.name} from 'lodash';`,
+                )
+                .join("\n"),
+            ),
+        });
       }
     },
   }),
