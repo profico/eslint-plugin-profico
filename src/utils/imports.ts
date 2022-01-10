@@ -6,7 +6,7 @@ import {
   Node,
 } from "estree";
 
-type SortedImportsResult = {
+type GroupedImportsResult = {
   start: number;
   end: number;
   text: string;
@@ -80,12 +80,6 @@ function isPossibleDirective(node: Node): boolean {
   );
 }
 
-const SortResult = {
-  SAME: 0,
-  AFTER: 1,
-  BEFORE: -1,
-} as const;
-
 function getGroupChunk(group: ImportGroup, declaration: ImportDeclaration) {
   if (isNamespaceImport(declaration)) {
     return group.namespace;
@@ -128,10 +122,10 @@ export function hasImports(body: Node[]): boolean {
   return body.find(node => isImportDeclaration(node)) !== undefined;
 }
 
-export function getSortedImports(
+export function getGroupedImports(
   context: Rule.RuleContext,
   body: Node[],
-): SortedImportsResult {
+): GroupedImportsResult {
   const startIndex = body.findIndex(
     node => isPossibleDirective(node) || isImportDeclaration(node),
   );
@@ -139,7 +133,7 @@ export function getSortedImports(
     body,
     node => isPossibleDirective(node) || isImportDeclaration(node),
   );
-  const nodesToSort = [...body].slice(startIndex, endIndex + 1);
+  const nodesToGroup = [...body].slice(startIndex, endIndex + 1);
 
   const directives: Node[] = [];
   const globalImports: ImportDeclaration[] = [];
@@ -156,7 +150,7 @@ export function getSortedImports(
   const stylesImports: ImportDeclaration[] = [];
   const restOfNodes: ImportDeclaration[] = [];
 
-  nodesToSort.forEach(node => {
+  nodesToGroup.forEach(node => {
     let targetGroup: (ImportDeclaration | Node)[] = restOfNodes;
 
     if (isPossibleDirective(node)) {
@@ -191,8 +185,8 @@ export function getSortedImports(
     ...restOfNodes,
   ];
 
-  const firstImportNode = nodesToSort[0];
-  const lastImportNode = nodesToSort[nodesToSort.length - 1];
+  const firstImportNode = nodesToGroup[0];
+  const lastImportNode = nodesToGroup[nodesToGroup.length - 1];
   const sourceCode = context.getSourceCode();
 
   return {

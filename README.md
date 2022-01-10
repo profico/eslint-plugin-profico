@@ -30,7 +30,7 @@ To use the recommended rules, add our plugin to your `.eslintrc` file:
   "plugins": ["@profico"],
   "rules": {
     "@profico/lodash-imports": ["error"],
-    "@profico/sorted-imports": ["error"],
+    "@profico/grouped-imports": ["error"],
   }
 }
 ```
@@ -51,13 +51,14 @@ import get from "lodash/get";
 import pick from "lodash/pick";
 ```
 
-### <a name="sorted-imports">sorted-imports</a>
+### <a name="grouped-imports">grouped-imports</a>
 
-- [x] Automatically sort import statements according to our style guide:
+- [x] Automatically group import statements according to our style guide:
       https://github.com/profico/react-boilerplate/blob/master/style-guide.md
 
       TODO:
       - [ ] Include comments as part of import statements
+      - [ ] Sort each import group alphabetically
 
 <br />
       

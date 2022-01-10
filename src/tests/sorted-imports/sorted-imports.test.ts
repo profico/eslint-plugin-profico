@@ -1,6 +1,6 @@
 import { RuleTester } from "eslint";
 
-import sortedImports from "../../rules/sorted-imports";
+import groupedImports from "../../rules/grouped-imports";
 
 import invalidCases from "./invalid-cases";
 import validCases from "./valid-cases";
@@ -12,11 +12,11 @@ const tester = new RuleTester({
   },
 });
 
-tester.run("sorted-imports", sortedImports, {
+tester.run("grouped-imports", groupedImports, {
   valid: validCases,
   invalid: invalidCases.map<RuleTester.InvalidTestCase>((code, index) => ({
     code,
     output: validCases[index],
-    errors: [{ messageId: "improperlySorted" }],
+    errors: [{ messageId: "improperlyGrouped" }],
   })),
 });

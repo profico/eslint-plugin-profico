@@ -4,7 +4,7 @@ const recommended: Linter.Config = {
   plugins: ["@profico"],
   rules: {
     "@profico/lodash-imports": ["error"],
-    "@profico/sorted-imports": ["error"],
+    "@profico/grouped-imports": ["error"],
   },
   parserOptions: {
     ecmaVersion: 2015,
