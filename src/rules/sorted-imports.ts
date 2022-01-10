@@ -1,6 +1,6 @@
 import { Rule } from "eslint";
 
-import { getSortedImports } from "../utils/imports";
+import { getSortedImports, hasImports } from "../utils/imports";
 
 const sortedImports: Rule.RuleModule = {
   meta: {
@@ -17,11 +17,16 @@ const sortedImports: Rule.RuleModule = {
   create: context => {
     return {
       Program: ({ body }) => {
+        if (!hasImports(body)) {
+          return null;
+        }
+
         const sourceCode = context.getSourceCode();
         const sorted = getSortedImports(context, body);
         const originalText = sourceCode
           .getText()
-          .slice(sorted.start, sorted.end);
+          .slice(sorted.start, sorted.end)
+          .trim();
 
         if (sorted.text !== originalText) {
           context.report({

@@ -118,6 +118,10 @@ function findLastIndex<T>(
   return -1;
 }
 
+export function hasImports(body: Node[]): boolean {
+  return body.find(node => isImportDeclaration(node)) !== undefined;
+}
+
 export function getSortedImports(
   context: Rule.RuleContext,
   body: Node[],
@@ -253,9 +257,12 @@ export function getSortedImports(
   return {
     text: grouped
       .map(node =>
-        isDivider(node) ? node.value : context.getSourceCode().getText(node),
+        isDivider(node)
+          ? node.value
+          : context.getSourceCode().getText(node).trim(),
       )
-      .join("\n"),
+      .join("\n")
+      .trim(),
     start: firstImportNode.range ? firstImportNode.range[0] : 0,
     end: lastImportNode.range ? lastImportNode.range[1] : 0,
   };
