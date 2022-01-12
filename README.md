@@ -4,7 +4,7 @@ This plugin is used to enforce some ESLint rules Profico developers use on a day
 
 ## Installation
 
-Install `eslint-plugin-profico` with npm:
+Install `@profi.co/eslint-plugin` with npm:
 
 ```
 npm install --save-dev @profi.co/eslint-plugin
