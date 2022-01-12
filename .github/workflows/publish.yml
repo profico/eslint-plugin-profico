@@ -17,6 +17,6 @@ jobs:
       - name: Prepare package for publishing
         run: yarn prepublish
       - name: Publish package
-        run: yarn publish
+        run: yarn publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
