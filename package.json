@@ -1,5 +1,5 @@
 {
-  "name": "@profico/eslint-plugin",
+  "name": "@profi.co/eslint-plugin",
   "repository": {
     "type": "git",
     "url": "https://github.com/profico/eslint-plugin-profico.git"
@@ -21,7 +21,7 @@
     "prepublish": "yarn run clean && yarn run build"
   },
   "publishConfig": {
-    "name": "@profico/eslint-plugin"
+    "name": "@profi.co/eslint-plugin"
   },
   "files": [
     "LICENSE",

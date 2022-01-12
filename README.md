@@ -7,13 +7,13 @@ This plugin is used to enforce some ESLint rules Profico developers use on a day
 Install `eslint-plugin-profico` with npm:
 
 ```
-npm install --save-dev @profico/eslint-plugin
+npm install --save-dev @profi.co/eslint-plugin
 ```
 
 or with yarn:
 
 ```
-yarn add --dev @profico/eslint-plugin
+yarn add --dev @profi.co/eslint-plugin
 ```
 
 ## Usage
@@ -22,15 +22,15 @@ To use the recommended rules, add our plugin to your `.eslintrc` file:
 
 ```json
 {
-  "extends": ["plugin:@profico/recommended"]
+  "extends": ["plugin:@profi.co/recommended"]
 }
 
 // or configure manually:
 {
-  "plugins": ["@profico"],
+  "plugins": ["@profi.co"],
   "rules": {
-    "@profico/lodash-imports": ["error"],
-    "@profico/grouped-imports": ["error"],
+    "@profi.co/lodash-imports": ["error"],
+    "@profi.co/grouped-imports": ["error"],
   }
 }
 ```
