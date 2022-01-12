@@ -56,9 +56,8 @@ import pick from "lodash/pick";
 - [x] Automatically group import statements according to our style guide:
       https://github.com/profico/react-boilerplate/blob/master/style-guide.md
 
-      TODO:
-      - [ ] Include comments as part of import statements
-      - [ ] Sort each import group alphabetically
+- [ ] Include comments as part of import statements
+- [ ] Sort each import group alphabetically
 
 <br />
       

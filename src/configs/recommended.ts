@@ -1,10 +1,10 @@
 import { Linter } from "eslint";
 
 const recommended: Linter.Config = {
-  plugins: ["@profico"],
+  plugins: ["@profi.co"],
   rules: {
-    "@profico/lodash-imports": ["error"],
-    "@profico/grouped-imports": ["error"],
+    "@profi.co/lodash-imports": ["error"],
+    "@profi.co/grouped-imports": ["error"],
   },
   parserOptions: {
     ecmaVersion: 2015,
