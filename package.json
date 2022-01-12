@@ -20,6 +20,9 @@
     "test": "yarn test:base",
     "prepublish": "yarn run clean && yarn run build"
   },
+  "publishConfig": {
+    "name": "@profico/eslint-plugin"
+  },
   "files": [
     "LICENSE",
     "README.md",
