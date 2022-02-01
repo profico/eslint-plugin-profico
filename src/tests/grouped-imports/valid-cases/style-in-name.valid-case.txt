@@ -1,0 +1,10 @@
+import React, { ReactNode } from 'react';
+import clsx from 'clsx';
+import makeStyles from '@mui/styles/makeStyles';
+
+import { Button, ButtonProps, CircularProgress, CircularProgressProps } from '@mui/material';
+import { omit } from 'lodash';
+
+import useFactory from '../../../hooks/useFactory';
+
+import styles from './ssps-button.module.scss';

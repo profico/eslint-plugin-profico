@@ -62,13 +62,20 @@ function isGlobalImport({ specifiers }: ImportDeclaration): boolean {
 
 function isStylesImport(declaration: ImportDeclaration): boolean {
   const sourceValue = getImportSourceValue(declaration);
+  const styleExtensions: string[] = [
+    ".css",
+    ".scss",
+    ".sass",
+    ".less",
+    "style.ts",
+    ".style.ts",
+    "style.js",
+    ".style.js",
+  ];
 
-  return (
-    sourceValue.endsWith("css") ||
-    sourceValue.endsWith("sass") ||
-    sourceValue.endsWith("less") ||
-    sourceValue.includes("style")
-  );
+  const match = styleExtensions.find(ext => sourceValue.endsWith(ext));
+
+  return match !== undefined;
 }
 
 // Mainly used with 'use strict' statements
