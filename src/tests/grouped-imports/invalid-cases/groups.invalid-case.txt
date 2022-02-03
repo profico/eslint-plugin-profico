@@ -1,8 +1,8 @@
 import { Named } from "named";
-import DefaultLocal from './default-local.ts';
+import DefaultLocal from './default-local';
 import React from "react";
-import { NamedLocal } from './named-local.ts';
-import { styles } from "./style.ts";
+import { NamedLocal } from './named-local';
+import { styles } from "./component.style";
 import 'global';
 import * as Local from "./local";
 import * as NS from "namespace";

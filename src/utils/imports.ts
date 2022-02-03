@@ -67,13 +67,12 @@ function isStylesImport(declaration: ImportDeclaration): boolean {
     ".scss",
     ".sass",
     ".less",
-    "style.ts",
-    ".style.ts",
-    "style.js",
-    ".style.js",
+    ".style", // css-in-js solutions should follow the *.style.(js|ts) naming convention
   ];
 
-  const match = styleExtensions.find(ext => sourceValue.endsWith(ext));
+  const match = styleExtensions.find(
+    ext => sourceValue.endsWith(ext) || sourceValue.includes(ext),
+  );
 
   return match !== undefined;
 }

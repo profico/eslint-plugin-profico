@@ -3,7 +3,7 @@ import React from "react";
 
 
 
-import { styles } from "./style.ts";
+import { styles } from "./component.style";
 
 
 import { Local } from "./local";
