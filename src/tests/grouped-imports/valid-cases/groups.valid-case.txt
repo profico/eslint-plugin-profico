@@ -10,8 +10,8 @@ import { Named } from "named";
 
 import * as Local from "./local";
 
-import DefaultLocal from './default-local.ts';
+import DefaultLocal from './default-local';
 
-import { NamedLocal } from './named-local.ts';
+import { NamedLocal } from './named-local';
 
-import { styles } from "./style.ts";
+import { styles } from "./component.style";

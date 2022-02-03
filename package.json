@@ -16,7 +16,7 @@
     "format": "yarn prettier --write && pretty-quick --staged",
     "format:check": "pretty-quick --staged && yarn prettier --check",
     "test:base": "jest --config jest.config.json",
-    "test:watch": "yarn test:base --watchAll",
+    "test:watch": "yarn test:base --watch",
     "test": "yarn test:base",
     "prepublish": "yarn run clean && yarn run build"
   },
