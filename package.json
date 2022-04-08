@@ -4,7 +4,7 @@
     "type": "git",
     "url": "https://github.com/profico/eslint-plugin-profico.git"
   },
-  "version": "1.0.6",
+  "version": "1.0.7",
   "description": "ESLint plugin by Profico",
   "main": "lib/index.js",
   "scripts": {
