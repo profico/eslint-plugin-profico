@@ -48,7 +48,9 @@ export function hasNamedImports(declaration: ImportDeclaration): boolean {
   );
 }
 
-function isNamespaceImport(node: Node): node is ImportNamespaceSpecifier {
+export function isNamespaceImport(
+  node: Node,
+): node is ImportNamespaceSpecifier {
   return (
     "specifiers" in node &&
     node.specifiers.length > 0 &&

@@ -1,6 +1,10 @@
 import { Rule } from "eslint";
 
-import { hasNamedImports, isDefaultImport } from "../utils/imports";
+import {
+  hasNamedImports,
+  isDefaultImport,
+  isNamespaceImport,
+} from "../utils/imports";
 
 const lodashImports: Rule.RuleModule = {
   meta: {
@@ -24,7 +28,7 @@ const lodashImports: Rule.RuleModule = {
         return null;
       }
 
-      if (isDefaultImport(node)) {
+      if (isNamespaceImport(node) || isDefaultImport(node)) {
         context.report({
           node,
           messageId: "noUnderscoreImport",

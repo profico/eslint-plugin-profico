@@ -30,6 +30,18 @@ tester.run("lodash-imports", lodashImports, {
       errors: [{ messageId: "noUnderscoreImport" }],
     },
     {
+      code: "import lodash from 'lodash';",
+      errors: [{ messageId: "noUnderscoreImport" }],
+    },
+    {
+      code: "import * as _ from 'lodash';",
+      errors: [{ messageId: "noUnderscoreImport" }],
+    },
+    {
+      code: "import * as lodash from 'lodash';",
+      errors: [{ messageId: "noUnderscoreImport" }],
+    },
+    {
       code: "import _, { get, pick } from 'lodash';",
       errors: [
         { messageId: "noUnderscoreImport" },
