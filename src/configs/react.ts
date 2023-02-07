@@ -24,6 +24,7 @@ const react: Linter.Config = {
     JSX: "readonly",
   },
   rules: {
+    "global-require": ["off"],
     "jsx-a11y/label-has-associated-control": [
       "error",
       {
@@ -41,9 +42,12 @@ const react: Linter.Config = {
       "warn",
       { extensions: [".js", ".jsx", ".ts", ".tsx"] },
     ],
+    "react/jsx-no-duplicate-props": ["warn", { ignoreCase: false }],
+    "react/jsx-one-expression-per-line": ["off"],
     "react/jsx-props-no-spreading": ["off"],
     "react/jsx-wrap-multilines": ["off"],
     "react/prop-types": ["off"],
+    "react/require-default-props": ["off"],
     "react/sort-comp": ["off"],
     "react/state-in-constructor": ["off"],
     "react/static-property-placement": ["off"],
