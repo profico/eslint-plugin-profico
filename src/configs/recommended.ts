@@ -101,6 +101,7 @@ const recommended: Linter.Config = {
     "import/no-unresolved": ["error"],
     "import/order": ["off"],
     "import/prefer-default-export": ["off"],
+    "max-count": ["error", 3],
     "newline-before-return": ["error"],
     "no-continue": ["off"],
     "no-param-reassign": [

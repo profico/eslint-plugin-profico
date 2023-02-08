@@ -1,7 +1,7 @@
 import { Linter } from "eslint";
 
 const nest: Linter.Config = {
-  extends: ["plugin:@profi.co/recommended"],
+  extends: [require.resolve("./recommended")],
   rules: {
     "import/no-unresolved": "off",
     "import/no-extraneous-dependencies": [

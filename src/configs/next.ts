@@ -1,7 +1,7 @@
 import { Linter } from "eslint";
 
 const next: Linter.Config = {
-  extends: ["next/core-web-vitals", "plugin:@profi.co/react"],
+  extends: ["next/core-web-vitals", require.resolve("./react")],
   rules: {
     "import/no-extraneous-dependencies": [
       "error",
