@@ -4,7 +4,7 @@
     "type": "git",
     "url": "https://github.com/profico/eslint-plugin-profico.git"
   },
-  "version": "1.1.5",
+  "version": "1.1.6",
   "description": "ESLint plugin and configurations by Profico",
   "main": "lib/index.js",
   "scripts": {
@@ -40,6 +40,9 @@
     "email": "fpolic@profico.hr"
   },
   "license": "MIT",
+  "peerDependencies": {
+    "eslint": ">=7"
+  },
   "devDependencies": {
     "@next/eslint-plugin-next": "^13.1.6",
     "@types/eslint": "^8.2.1",
