@@ -4,7 +4,7 @@ const react: Linter.Config = {
   env: {
     browser: true,
   },
-  extends: ["airbnb", require.resolve("./recommended")],
+  extends: ["airbnb", "plugin:@profi.co/recommended"],
   plugins: ["react-hooks"],
   settings: {
     react: {
