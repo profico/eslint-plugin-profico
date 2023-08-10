@@ -1,0 +1,249 @@
+import { Rule, SourceCode } from "eslint";
+import {
+  ClassDeclaration,
+  Directive,
+  ModuleDeclaration,
+  Program,
+  Statement,
+  Node,
+} from "estree";
+import { findImportsByPackageName } from "../utils/imports-finder";
+
+interface ProficoNodeBodyElement {
+  decorators?: ProficoDecorator[];
+  type: "PropertyDefinition";
+}
+
+interface ProficoDecorator {
+  expression: {
+    callee: {
+      name: string;
+    };
+  };
+  type: "Decorator";
+  range: number[];
+}
+
+const dtoDecorators: Rule.RuleModule = {
+  meta: {
+    fixable: "code",
+    type: "problem",
+    messages: {
+      improperlyOrderedDecorators: "Decorators are not properly ordered.",
+    },
+    docs: {
+      url: "https://github.com/profico/eslint-plugin-profico#dto-decorators",
+    },
+  },
+  create: context => {
+    return {
+      Program({ body }: Program) {
+        const optionalDecorator = new Set(["IsOptional"]);
+        const allNonCustomDecorators = new Set(["IsOptional"]);
+
+        let swaggerDecorators: Set<string> = new Set();
+        let classTransformerDecorators: Set<string> = new Set();
+        let classValidatorDecorators: Set<string> = new Set();
+
+        function getOrderedDecorators(
+          decorators: ProficoDecorator[],
+          sourceCode: SourceCode,
+        ) {
+          const swaggerDecs = decorators.filter(dec =>
+            swaggerDecorators.has(dec.expression.callee.name),
+          );
+
+          const classTransformerDecs = decorators.filter(dec =>
+            classTransformerDecorators.has(dec.expression.callee.name),
+          );
+
+          const classValidatorDecs = decorators
+            .filter(
+              dec =>
+                classValidatorDecorators.has(dec.expression.callee.name) &&
+                dec.expression.callee.name !== "IsOptional",
+            )
+            .sort((a, b) => {
+              if (b.expression.callee.name > a.expression.callee.name) {
+                return -1;
+              } else return 1;
+            });
+
+          const optionalityDecs = decorators.filter(dec =>
+            optionalDecorator.has(dec.expression.callee.name),
+          );
+
+          const customDecs = decorators
+            .filter(
+              dec => !allNonCustomDecorators.has(dec.expression.callee.name),
+            )
+            .sort((a, b) => {
+              if (b.expression.callee.name > a.expression.callee.name) {
+                return -1;
+              } else return 1;
+            });
+
+          const orderedDecorators = [
+            ...swaggerDecs,
+            ...classTransformerDecs,
+            ...classValidatorDecs,
+            ...optionalityDecs,
+            ...customDecs,
+          ];
+
+          const firstImportNode = decorators[0];
+          const lastImportNode = decorators[decorators.length - 1];
+
+          return {
+            decorators: orderedDecorators,
+            text: orderedDecorators
+              .map(node => {
+                console.log(sourceCode.getLines());
+                return sourceCode.getText(node as unknown as Node).trim();
+              })
+              .join("\n")
+              .trim(),
+            start: firstImportNode.range ? firstImportNode.range[0] : 0,
+            end: lastImportNode.range ? lastImportNode.range[1] : 0,
+          };
+        }
+
+        function findSwaggerDecorators(
+          body: (ModuleDeclaration | Statement | Directive)[],
+        ): void {
+          swaggerDecorators = findImportsByPackageName(body, "@nestjs/swagger");
+
+          Array.from(swaggerDecorators).forEach(decorator => {
+            allNonCustomDecorators.add(decorator);
+          });
+        }
+
+        function findClassTransformerDecorators(
+          body: (ModuleDeclaration | Statement | Directive)[],
+        ): void {
+          classTransformerDecorators = findImportsByPackageName(
+            body,
+            "class-transformer",
+          );
+
+          Array.from(classTransformerDecorators).forEach(decorator => {
+            allNonCustomDecorators.add(decorator);
+          });
+        }
+
+        function findClassValidatorDecorators(
+          body: (ModuleDeclaration | Statement | Directive)[],
+        ): void {
+          classValidatorDecorators = findImportsByPackageName(
+            body,
+            "class-validator",
+          );
+
+          Array.from(classValidatorDecorators).forEach(decorator => {
+            allNonCustomDecorators.add(decorator);
+          });
+        }
+
+        function setDecorators(
+          body: (ModuleDeclaration | Statement | Directive)[],
+        ): void {
+          findSwaggerDecorators(body);
+          findClassTransformerDecorators(body);
+          findClassValidatorDecorators(body);
+        }
+
+        setDecorators(body);
+        console.log(Array.from(allNonCustomDecorators));
+        if (
+          swaggerDecorators.size === 0 &&
+          classValidatorDecorators.size === 0 &&
+          classTransformerDecorators.size === 0
+        ) {
+          return;
+        }
+
+        const sourceCode = context.getSourceCode();
+        const classNode = body.find(
+          el =>
+            el.type === "ClassDeclaration" ||
+            ((el.type === "ExportNamedDeclaration" ||
+              el.type === "ExportDefaultDeclaration") &&
+              el.declaration?.type === "ClassDeclaration"),
+        ) as ClassDeclaration | undefined;
+
+        if (!classNode) {
+          return;
+        }
+
+        let classBody;
+        // @ts-ignore
+        if (!classNode.body && !classNode.declaration) {
+          return;
+        } else if (classNode.body) {
+          if (classNode.body.body) {
+            classBody = classNode.body.body;
+          } else {
+            return;
+          }
+        } else {
+          if (
+            // @ts-ignore
+            !classNode.declaration.body &&
+            // @ts-ignore
+            !classNode.declaration.body.body
+          ) {
+            return;
+          } else {
+            // @ts-ignore
+            classBody = classNode.declaration.body.body;
+          }
+        }
+
+        console.log({ classBody });
+
+        /**
+         * ClassProperty is not existing for some reason in types.
+         */
+        for (let i = 0; i < classBody.length; i++) {
+          const classNodeBodyElement = classBody[i] as ProficoNodeBodyElement;
+          console.log({ classNodeBodyElement });
+          if (
+            classNodeBodyElement.type !== "PropertyDefinition" ||
+            !classNodeBodyElement.decorators
+          ) {
+            continue;
+          }
+
+          const orderedDecorators = getOrderedDecorators(
+            classNodeBodyElement.decorators,
+            sourceCode,
+          );
+
+          const originalDecoratorNames = classNodeBodyElement.decorators
+            .map(el => el.expression.callee.name)
+            .join();
+          const orderedDecoratorNames = orderedDecorators.decorators
+            .map(el => el.expression.callee.name)
+            .join();
+
+          if (originalDecoratorNames !== orderedDecoratorNames) {
+            context.report({
+              messageId: "improperlyOrderedDecorators",
+              loc: {
+                start: sourceCode.getLocFromIndex(orderedDecorators.start),
+                end: sourceCode.getLocFromIndex(orderedDecorators.end),
+              },
+              fix: fixer =>
+                fixer.replaceTextRange(
+                  [orderedDecorators.start, orderedDecorators.end],
+                  orderedDecorators.text,
+                ),
+            });
+          }
+        }
+      },
+    };
+  },
+};
+
+export default dtoDecorators;

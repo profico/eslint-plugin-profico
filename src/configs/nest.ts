@@ -3,6 +3,7 @@ import { Linter } from "eslint";
 const nest: Linter.Config = {
   extends: ["plugin:@profi.co/recommended"],
   rules: {
+    "@profi.co/dto-decorators": ["error"],
     "import/no-unresolved": "off",
     "import/no-extraneous-dependencies": [
       "error",
