@@ -42,7 +42,7 @@ const dtoDecorators: Rule.RuleModule = {
         const optionalDecorator = new Set(["IsOptional"]);
         const allNonCustomDecorators = new Set(["IsOptional"]);
 
-        let swaggerDecorators: Set<string> = findImportsByPackageName(
+        const swaggerDecorators: Set<string> = findImportsByPackageName(
           body,
           "@nestjs/swagger",
         );
@@ -51,16 +51,14 @@ const dtoDecorators: Rule.RuleModule = {
           allNonCustomDecorators.add(decorator);
         });
 
-        let classTransformerDecorators: Set<string> = findImportsByPackageName(
-          body,
-          "class-transformer",
-        );
+        const classTransformerDecorators: Set<string> =
+          findImportsByPackageName(body, "class-transformer");
 
         Array.from(classTransformerDecorators).forEach(decorator => {
           allNonCustomDecorators.add(decorator);
         });
 
-        let classValidatorDecorators: Set<string> = findImportsByPackageName(
+        const classValidatorDecorators: Set<string> = findImportsByPackageName(
           body,
           "class-validator",
         );
