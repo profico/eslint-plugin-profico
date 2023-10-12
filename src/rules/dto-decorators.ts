@@ -42,53 +42,32 @@ const dtoDecorators: Rule.RuleModule = {
         const optionalDecorator = new Set(["IsOptional"]);
         const allNonCustomDecorators = new Set(["IsOptional"]);
 
-        let swaggerDecorators: Set<string> = new Set();
-        let classTransformerDecorators: Set<string> = new Set();
-        let classValidatorDecorators: Set<string> = new Set();
+        let swaggerDecorators: Set<string> = findImportsByPackageName(
+          body,
+          "@nestjs/swagger",
+        );
 
-        function findSwaggerDecorators(
-          body: (ModuleDeclaration | Statement | Directive)[],
-        ): void {
-          swaggerDecorators = findImportsByPackageName(body, "@nestjs/swagger");
+        Array.from(swaggerDecorators).forEach(decorator => {
+          allNonCustomDecorators.add(decorator);
+        });
 
-          Array.from(swaggerDecorators).forEach(decorator => {
-            allNonCustomDecorators.add(decorator);
-          });
-        }
+        let classTransformerDecorators: Set<string> = findImportsByPackageName(
+          body,
+          "class-transformer",
+        );
 
-        function findClassTransformerDecorators(
-          body: (ModuleDeclaration | Statement | Directive)[],
-        ): void {
-          classTransformerDecorators = findImportsByPackageName(
-            body,
-            "class-transformer",
-          );
+        Array.from(classTransformerDecorators).forEach(decorator => {
+          allNonCustomDecorators.add(decorator);
+        });
 
-          Array.from(classTransformerDecorators).forEach(decorator => {
-            allNonCustomDecorators.add(decorator);
-          });
-        }
+        let classValidatorDecorators: Set<string> = findImportsByPackageName(
+          body,
+          "class-validator",
+        );
 
-        function findClassValidatorDecorators(
-          body: (ModuleDeclaration | Statement | Directive)[],
-        ): void {
-          classValidatorDecorators = findImportsByPackageName(
-            body,
-            "class-validator",
-          );
-
-          Array.from(classValidatorDecorators).forEach(decorator => {
-            allNonCustomDecorators.add(decorator);
-          });
-        }
-
-        function setDecorators(
-          body: (ModuleDeclaration | Statement | Directive)[],
-        ): void {
-          findSwaggerDecorators(body);
-          findClassTransformerDecorators(body);
-          findClassValidatorDecorators(body);
-        }
+        Array.from(classValidatorDecorators).forEach(decorator => {
+          allNonCustomDecorators.add(decorator);
+        });
 
         function getOrderedDecorators(
           decorators: ProficoDecorator[],
@@ -151,8 +130,6 @@ const dtoDecorators: Rule.RuleModule = {
             end: lastImportNode.range ? lastImportNode.range[1] : 0,
           };
         }
-
-        setDecorators(body);
 
         if (
           swaggerDecorators.size === 0 &&
