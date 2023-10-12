@@ -6,6 +6,7 @@ import {
   Program,
   Statement,
   Node,
+  ExportDefaultDeclaration,
 } from "estree";
 import { findImportsByPackageName } from "../utils/imports-finder";
 
@@ -44,6 +45,50 @@ const dtoDecorators: Rule.RuleModule = {
         let swaggerDecorators: Set<string> = new Set();
         let classTransformerDecorators: Set<string> = new Set();
         let classValidatorDecorators: Set<string> = new Set();
+
+        function findSwaggerDecorators(
+          body: (ModuleDeclaration | Statement | Directive)[],
+        ): void {
+          swaggerDecorators = findImportsByPackageName(body, "@nestjs/swagger");
+
+          Array.from(swaggerDecorators).forEach(decorator => {
+            allNonCustomDecorators.add(decorator);
+          });
+        }
+
+        function findClassTransformerDecorators(
+          body: (ModuleDeclaration | Statement | Directive)[],
+        ): void {
+          classTransformerDecorators = findImportsByPackageName(
+            body,
+            "class-transformer",
+          );
+
+          Array.from(classTransformerDecorators).forEach(decorator => {
+            allNonCustomDecorators.add(decorator);
+          });
+        }
+
+        function findClassValidatorDecorators(
+          body: (ModuleDeclaration | Statement | Directive)[],
+        ): void {
+          classValidatorDecorators = findImportsByPackageName(
+            body,
+            "class-validator",
+          );
+
+          Array.from(classValidatorDecorators).forEach(decorator => {
+            allNonCustomDecorators.add(decorator);
+          });
+        }
+
+        function setDecorators(
+          body: (ModuleDeclaration | Statement | Directive)[],
+        ): void {
+          findSwaggerDecorators(body);
+          findClassTransformerDecorators(body);
+          findClassValidatorDecorators(body);
+        }
 
         function getOrderedDecorators(
           decorators: ProficoDecorator[],
@@ -98,7 +143,6 @@ const dtoDecorators: Rule.RuleModule = {
             decorators: orderedDecorators,
             text: orderedDecorators
               .map(node => {
-                console.log(sourceCode.getLines());
                 return sourceCode.getText(node as unknown as Node).trim();
               })
               .join("\n")
@@ -108,52 +152,8 @@ const dtoDecorators: Rule.RuleModule = {
           };
         }
 
-        function findSwaggerDecorators(
-          body: (ModuleDeclaration | Statement | Directive)[],
-        ): void {
-          swaggerDecorators = findImportsByPackageName(body, "@nestjs/swagger");
-
-          Array.from(swaggerDecorators).forEach(decorator => {
-            allNonCustomDecorators.add(decorator);
-          });
-        }
-
-        function findClassTransformerDecorators(
-          body: (ModuleDeclaration | Statement | Directive)[],
-        ): void {
-          classTransformerDecorators = findImportsByPackageName(
-            body,
-            "class-transformer",
-          );
-
-          Array.from(classTransformerDecorators).forEach(decorator => {
-            allNonCustomDecorators.add(decorator);
-          });
-        }
-
-        function findClassValidatorDecorators(
-          body: (ModuleDeclaration | Statement | Directive)[],
-        ): void {
-          classValidatorDecorators = findImportsByPackageName(
-            body,
-            "class-validator",
-          );
-
-          Array.from(classValidatorDecorators).forEach(decorator => {
-            allNonCustomDecorators.add(decorator);
-          });
-        }
-
-        function setDecorators(
-          body: (ModuleDeclaration | Statement | Directive)[],
-        ): void {
-          findSwaggerDecorators(body);
-          findClassTransformerDecorators(body);
-          findClassValidatorDecorators(body);
-        }
-
         setDecorators(body);
-        console.log(Array.from(allNonCustomDecorators));
+
         if (
           swaggerDecorators.size === 0 &&
           classValidatorDecorators.size === 0 &&
@@ -163,6 +163,7 @@ const dtoDecorators: Rule.RuleModule = {
         }
 
         const sourceCode = context.getSourceCode();
+
         const classNode = body.find(
           el =>
             el.type === "ClassDeclaration" ||
@@ -176,6 +177,7 @@ const dtoDecorators: Rule.RuleModule = {
         }
 
         let classBody;
+
         // @ts-ignore
         if (!classNode.body && !classNode.declaration) {
           return;
@@ -199,14 +201,9 @@ const dtoDecorators: Rule.RuleModule = {
           }
         }
 
-        console.log({ classBody });
-
-        /**
-         * ClassProperty is not existing for some reason in types.
-         */
         for (let i = 0; i < classBody.length; i++) {
           const classNodeBodyElement = classBody[i] as ProficoNodeBodyElement;
-          console.log({ classNodeBodyElement });
+
           if (
             classNodeBodyElement.type !== "PropertyDefinition" ||
             !classNodeBodyElement.decorators
