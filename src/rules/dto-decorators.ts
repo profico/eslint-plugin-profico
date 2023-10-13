@@ -110,8 +110,7 @@ const dtoDecorators: Rule.RuleModule = {
             decorators: orderedDecorators,
             text: orderedDecorators
               .map(node => sourceCode.getText(node as unknown as Node).trim())
-              .join("\n")
-              .trim(),
+              .join("\n  "),
             start: firstImportNode.range ? firstImportNode.range[0] : 0,
             end: lastImportNode.range ? lastImportNode.range[1] : 0,
           };
