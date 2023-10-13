@@ -1,14 +1,6 @@
 import { Rule, SourceCode } from "eslint";
-import {
-  ClassDeclaration,
-  Directive,
-  ModuleDeclaration,
-  Program,
-  Statement,
-  Node,
-  ExportDefaultDeclaration,
-} from "estree";
-import { findImportsByPackageName } from "../utils/imports-finder";
+import { ClassDeclaration, Program, Node } from "estree";
+import { findImportsByPackageName } from "../utils/imports";
 
 interface ProficoNodeBodyElement {
   decorators?: ProficoDecorator[];
