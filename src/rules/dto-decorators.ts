@@ -17,6 +17,8 @@ interface ProficoDecorator {
   range: number[];
 }
 
+const IS_OPTIONAL = "IsOptional";
+
 const dtoDecorators: Rule.RuleModule = {
   meta: {
     fixable: "code",
@@ -31,8 +33,8 @@ const dtoDecorators: Rule.RuleModule = {
   create: context => {
     return {
       Program({ body }: Program) {
-        const optionalDecorator = new Set(["IsOptional"]);
-        const allNonCustomDecorators = new Set(["IsOptional"]);
+        const optionalDecorator = new Set([IS_OPTIONAL]);
+        const allNonCustomDecorators = new Set([IS_OPTIONAL]);
 
         const swaggerDecorators: Set<string> = findImportsByPackageName(
           body,
@@ -75,7 +77,7 @@ const dtoDecorators: Rule.RuleModule = {
             .filter(
               dec =>
                 classValidatorDecorators.has(dec.expression.callee.name) &&
-                dec.expression.callee.name !== "IsOptional",
+                dec.expression.callee.name !== IS_OPTIONAL,
             )
             .sort((a, b) => {
               if (b.expression.callee.name > a.expression.callee.name) {
