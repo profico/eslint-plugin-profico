@@ -15,6 +15,11 @@ interface ProficoDecorator {
   };
   type: "Decorator";
   range: number[];
+  loc: {
+    start: {
+      column: number;
+    };
+  };
 }
 
 const IS_OPTIONAL = "IsOptional";
@@ -106,11 +111,19 @@ const dtoDecorators: Rule.RuleModule = {
           const firstImportNode = decorators[0];
           const lastImportNode = decorators[decorators.length - 1];
 
+          const numberOfSpacesInIndent = decorators[0].loc.start.column;
+
           return {
             decorators: orderedDecorators,
             text: orderedDecorators
               .map(node => sourceCode.getText(node as unknown as Node).trim())
-              .join("\n  "),
+              .join(
+                `\n`.concat(
+                  new Array(numberOfSpacesInIndent)
+                    .fill(" ", 0, numberOfSpacesInIndent)
+                    .join(""),
+                ),
+              ),
             start: firstImportNode.range ? firstImportNode.range[0] : 0,
             end: lastImportNode.range ? lastImportNode.range[1] : 0,
           };
