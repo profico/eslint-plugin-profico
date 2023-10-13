@@ -79,11 +79,9 @@ const dtoDecorators: Rule.RuleModule = {
                 classValidatorDecorators.has(dec.expression.callee.name) &&
                 dec.expression.callee.name !== IS_OPTIONAL,
             )
-            .sort((a, b) => {
-              if (b.expression.callee.name > a.expression.callee.name) {
-                return -1;
-              } else return 1;
-            });
+            .sort((a, b) =>
+              b.expression.callee.name > a.expression.callee.name ? -1 : 1,
+            );
 
           const optionalityDecs = decorators.filter(dec =>
             optionalDecorator.has(dec.expression.callee.name),
@@ -93,11 +91,9 @@ const dtoDecorators: Rule.RuleModule = {
             .filter(
               dec => !allNonCustomDecorators.has(dec.expression.callee.name),
             )
-            .sort((a, b) => {
-              if (b.expression.callee.name > a.expression.callee.name) {
-                return -1;
-              } else return 1;
-            });
+            .sort((a, b) =>
+              b.expression.callee.name > a.expression.callee.name ? -1 : 1,
+            );
 
           const orderedDecorators = [
             ...swaggerDecs,
@@ -113,9 +109,7 @@ const dtoDecorators: Rule.RuleModule = {
           return {
             decorators: orderedDecorators,
             text: orderedDecorators
-              .map(node => {
-                return sourceCode.getText(node as unknown as Node).trim();
-              })
+              .map(node => sourceCode.getText(node as unknown as Node).trim())
               .join("\n")
               .trim(),
             start: firstImportNode.range ? firstImportNode.range[0] : 0,
@@ -145,29 +139,13 @@ const dtoDecorators: Rule.RuleModule = {
           return;
         }
 
-        let classBody;
+        const classBody =
+          classNode.body?.body ||
+          // @ts-expect-error
+          classNode.declaration?.body?.body;
 
-        // @ts-ignore
-        if (!classNode.body && !classNode.declaration) {
+        if (!classBody) {
           return;
-        } else if (classNode.body) {
-          if (classNode.body.body) {
-            classBody = classNode.body.body;
-          } else {
-            return;
-          }
-        } else {
-          if (
-            // @ts-ignore
-            !classNode.declaration.body &&
-            // @ts-ignore
-            !classNode.declaration.body.body
-          ) {
-            return;
-          } else {
-            // @ts-ignore
-            classBody = classNode.declaration.body.body;
-          }
         }
 
         for (let i = 0; i < classBody.length; i++) {
