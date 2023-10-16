@@ -1,9 +1,12 @@
 import { Rule } from "eslint";
 import {
+  Directive,
   ImportDeclaration,
   ImportDefaultSpecifier,
   ImportNamespaceSpecifier,
+  ModuleDeclaration,
   Node,
+  Statement,
 } from "estree";
 
 type GroupedImportsResult = {
@@ -207,4 +210,31 @@ export function getGroupedImports(
     start: firstImportNode.range ? firstImportNode.range[0] : 0,
     end: lastImportNode.range ? lastImportNode.range[1] : 0,
   };
+}
+
+export function findImportsByPackageName(
+  body: (ModuleDeclaration | Statement | Directive)[],
+  packageName: string,
+): Set<string> {
+  const importedSet = new Set<string>();
+
+  const importDeclarations = body.find(
+    el => el.type === "ImportDeclaration" && el.source.value === packageName,
+  ) as ImportDeclaration;
+
+  if (!importDeclarations) {
+    return importedSet;
+  }
+
+  const importTokens = importDeclarations.specifiers.filter(
+    el => el.type === "ImportSpecifier",
+  );
+
+  importTokens.forEach(importToken => {
+    if (!importedSet.has(importToken.local.name)) {
+      importedSet.add(importToken.local.name);
+    }
+  });
+
+  return importedSet;
 }

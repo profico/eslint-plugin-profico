@@ -4,7 +4,7 @@
     "type": "git",
     "url": "https://github.com/profico/eslint-plugin-profico.git"
   },
-  "version": "1.1.7",
+  "version": "1.2.0",
   "description": "ESLint plugin and configurations by Profico",
   "main": "lib/index.js",
   "scripts": {
@@ -45,12 +45,12 @@
   },
   "devDependencies": {
     "@next/eslint-plugin-next": "^13.1.6",
-    "@types/eslint": "^8.2.1",
-    "@types/estree": "^0.0.50",
+    "@types/eslint": "^8.44.1",
+    "@types/estree": "^1.0.1",
     "@types/node": "^17.0.5",
     "@typescript-eslint/eslint-plugin": "^5.51.0",
     "@typescript-eslint/parser": "^5.8.1",
-    "eslint": "^8.5.0",
+    "eslint": "8.9.0",
     "eslint-config-airbnb": "^19.0.4",
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-config-next": "^13.1.6",

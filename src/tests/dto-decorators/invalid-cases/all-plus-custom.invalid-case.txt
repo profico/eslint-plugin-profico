@@ -1,0 +1,13 @@
+import { ApiProperty } from '@nestjs/swagger';
+import { IsString, IsOptional } from 'class-validator';
+import { Type } from 'class-transformer';
+import { Custom } from 'custom';
+
+export class Dto {
+  @ApiProperty()
+  @Type()
+  @IsString()
+  @Custom()
+  @IsOptional()
+  public name: string;
+}
