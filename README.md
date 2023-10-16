@@ -31,6 +31,7 @@ To use the recommended rules, add our plugin to your `.eslintrc` file:
   "rules": {
     "@profi.co/lodash-imports": ["error"],
     "@profi.co/grouped-imports": ["error"],
+    "@profi.co/dto-decorators": ["error"]
   }
 }
 ```
@@ -58,6 +59,22 @@ import pick from "lodash/pick";
 
 - [ ] Include comments as part of import statements
 - [ ] Sort each import group alphabetically
+
+### <a name="dto-decorators">dto-decorators</a>
+
+- [x] Default import lodash modules instead of importing the whole library or parts of it:
+
+```tsx
+// Bad
+@IsString()
+@ApiProperty()
+public classProperty: string;
+
+// Good
+@ApiProperty()
+@IsString()
+public classProperty: string;
+```
 
 <br />
       
