@@ -1,0 +1,56 @@
+import { Controller, Get, Query, Req } from '@nestjs/common';
+import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { Request } from 'express';
+
+import { ReadNearestLocationDto } from './dto/read-nearest-location.dto';
+import { LocationInRangeQueryParams } from './query-params/location-in-range.query-params';
+import { NearestLocationQueryParams } from './query-params/nearest-location.query-params';
+import { NearestLocationsService } from './nearest-locations.service';
+
+@ApiTags('Nearest locations')
+@Controller('nearest-locations')
+export class NearestLocationsController {
+  private readonly nearestDistanceConditions = {
+    kmDistance: 20,
+    locationsLimit: 30,
+  };
+
+  private readonly distanceConditions = {
+    kmDistance: 100,
+    locationsLimit: 200,
+  };
+
+  constructor(
+    private readonly nearestLocationsService: NearestLocationsService,
+  ) {}
+
+  @Get()
+  @ApiOkResponse()
+  public findAll(
+    @Query() queryParams: NearestLocationQueryParams,
+    @Req() req: Request,
+  ): Promise<ReadNearestLocationDto[]> {
+    return this.nearestLocationsService.find(
+      req,
+      queryParams,
+      this.nearestDistanceConditions,
+    );
+  }
+
+  /**
+   * @description A search radius of 100km is currently hardcoded here,
+   * but in the future it could potentially be a path param.
+   */
+  @Get('100-km')
+  @ApiOkResponse()
+  public findAllInRange(
+    @Query() queryParams: LocationInRangeQueryParams,
+    @Req() req: Request,
+  ): Promise<ReadNearestLocationDto[]> {
+    return this.nearestLocationsService.findAllInRange(
+      req,
+      queryParams,
+      this.distanceConditions,
+    );
+  }
+}
