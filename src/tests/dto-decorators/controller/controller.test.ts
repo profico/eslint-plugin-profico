@@ -12,7 +12,9 @@ const controllerCode = readFileSync(
   path.join(__dirname, "controller.txt"),
 ).toString();
 
-tester.run("dto-decorators/controller", dtoDecorators, {
-  valid: [{ filename: "controller.txt", code: controllerCode }],
+tester.run("dto-decorators", dtoDecorators, {
+  valid: [
+    { filename: "controller.txt", code: controllerCode, name: "controller" },
+  ],
   invalid: [],
 });
