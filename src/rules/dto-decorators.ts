@@ -165,7 +165,8 @@ const dtoDecorators: Rule.RuleModule = {
 
           if (
             classNodeBodyElement.type !== "PropertyDefinition" ||
-            !classNodeBodyElement.decorators
+            !classNodeBodyElement.decorators ||
+            classNodeBodyElement.decorators.length === 0
           ) {
             continue;
           }
