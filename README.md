@@ -80,22 +80,22 @@ public classProperty: string;
 ```tsx
 // Bad
 public findAll(
-  @Req() req: VinifyRequest,
-  @Query() queryParams: ReadBookmarksQueryParams,
-  @Custom2() huehue: Huehue,
-  @Custom1() hehe: Hehe,
-): Promise<PaginatedResponseDto<ReadBookmarkDto>> {
-  return this.readBookmarksService.find(queryParams, req, req.lang);
+  @Req() req: ProficoRequest,
+  @Query() queryParams: QueryParams,
+  @Custom2() customParam2: CustomParam,
+  @Custom1() customParam1: CustomParam,
+) {
+  return this.service.find();
 }
 
 // Good
 public findAll(
-  @Query() queryParams: ReadBookmarksQueryParams,
-  @Req() req: VinifyRequest,
-  @Custom1() hehe: Hehe,
-  @Custom2() huehue: Huehue,
-): Promise<PaginatedResponseDto<ReadBookmarkDto>> {
-  return this.readBookmarksService.find(queryParams, req, req.lang);
+  @Query() queryParams: QueryParams,
+  @Req() req: ProficoRequest,
+  @Custom1() customParam1: CustomParam,
+  @Custom2() customParam2: CustomParam,
+) {
+  return this.service.find();
 }
 ```
 

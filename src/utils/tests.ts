@@ -13,6 +13,8 @@ export function readAllFilesInDir(
     );
   }
 
+  allFilenames = allFilenames.filter(el => el.endsWith(".txt"));
+
   return allFilenames.map(filename =>
     fs.readFileSync(path.join(dir, filename)).toString().trim(),
   );

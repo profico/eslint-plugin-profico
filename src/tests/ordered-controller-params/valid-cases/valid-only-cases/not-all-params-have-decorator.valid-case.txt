@@ -4,10 +4,10 @@ import {
   CustomParam,
   ValuesDto,
   PathParams,
+  Param,
 } from '@app/globals';
 import {
   Body,
-  Controller,
   Delete,
   Get,
   HttpCode,
@@ -16,10 +16,9 @@ import {
   Post,
   Query,
   Req,
+  Controller,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
-
-import { Custom1, Custom2 } from 'customdecs';
 
 @ApiTags('Profico test')
 @Controller('profico-tests')
@@ -30,10 +29,9 @@ export class TestController {
 
   @Get()
   public findAll(
-    @Query() queryParams: QueryParams,
     @Req() req: ProficoRequest,
-    @Custom2() customParam2: CustomParam,
-    @Custom1() customParam1: CustomParam,
+    @Query() queryParams: QueryParams,
+    paramWithoutDecorator: Param,
   ) {
     return this.service.find();
   }

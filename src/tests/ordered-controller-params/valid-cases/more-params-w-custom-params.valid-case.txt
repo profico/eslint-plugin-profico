@@ -1,13 +1,10 @@
-import { Bookmark } from '@app/database/models';
 import {
-  ApiPaginatedResponse,
-  IdPathParams,
-  PaginatedResponseDto,
-  VinifyRequest,
+  QueryParams,
+  ProficoRequest,
+  CustomParam,
+  ValuesDto,
+  PathParams,
 } from '@app/globals';
-import { AuthenticatedRequest } from '@app/security/guard/interfaces/authenticated-request.interface';
-import { JwtGuard } from '@app/security/guard/jwt.guard';
-import { VerifiedUserGuard } from '@app/security/guard/verified-user.guard';
 import {
   Body,
   Controller,
@@ -19,57 +16,38 @@ import {
   Post,
   Query,
   Req,
-  UseGuards,
 } from '@nestjs/common';
-import { ApiCreatedResponse, ApiExtraModels, ApiTags } from '@nestjs/swagger';
+import { ApiTags } from '@nestjs/swagger';
 
-import { ReadBookmarksQueryParams } from '../query-params/read-bookmarks.query-params';
-import { CreateBookmarkDto } from '../dto/create-bookmark.dto';
-import { ReadBookmarkDto } from '../dto/read-dto/read-bookmark.dto';
-import { CreateBookmarksService } from '../services/create-bookmarks.service';
-import { DeleteBookmarksService } from '../services/delete-bookmarks.service';
-import { ReadBookmarksService } from '../services/read-bookmarks.service';
-import { BookmarkOwnerGuard } from '../guards/bookmark-owner.guard';
 import { Custom1, Custom2 } from 'customdecs';
 
-@UseGuards(JwtGuard, VerifiedUserGuard)
-@ApiTags('Bookmarks')
-@ApiExtraModels(ReadBookmarkDto)
-@Controller('bookmarks')
-export class BookmarksController {
+@ApiTags('Profico test')
+@Controller('profico-tests')
+export class TestController {
   constructor(
-    private readonly readBookmarksService: ReadBookmarksService,
-    private readonly createBookmarksService: CreateBookmarksService,
-    private readonly deleteBookmarksService: DeleteBookmarksService,
+    private readonly service: Service,
   ) {}
 
   @Get()
-  @ApiPaginatedResponse(ReadBookmarkDto)
   public findAll(
-    @Query() queryParams: ReadBookmarksQueryParams,
-    @Req() req: VinifyRequest,
-    @Custom1() hehe: Hehe,
-    @Custom2() huehue: Huehue,
-  ): Promise<PaginatedResponseDto<ReadBookmarkDto>> {
-    return this.readBookmarksService.find(queryParams, req, req.lang);
+    @Query() queryParams: QueryParams,
+    @Req() req: ProficoRequest,
+    @Custom1() customParam1: CustomParam,
+    @Custom2() customParam2: CustomParam,
+  ) {
+    return this.service.find();
   }
 
-  /**
-   * @todo Missing response documentation. Can't reuse ReadBookmarkDto.
-   */
   @Post()
-  @ApiCreatedResponse()
   public create(
-    @Body() values: CreateBookmarkDto,
-    @Req() { user }: AuthenticatedRequest,
-  ): Promise<Bookmark> {
-    return this.createBookmarksService.create(values, user.id);
+    @Body() values: ValuesDto,
+    @Req() { user }: ProficoRequest,
+  ) {
+    return this.service.create(values, user.id);
   }
 
-  @UseGuards(BookmarkOwnerGuard)
   @Delete(':id')
-  @HttpCode(HttpStatus.NO_CONTENT)
-  public delete(@Param() { id }: IdPathParams): Promise<void> {
-    return this.deleteBookmarksService.delete(id);
+  public delete(@Param() { id }: PathParams) {
+    return this.service.delete(id);
   }
 }
