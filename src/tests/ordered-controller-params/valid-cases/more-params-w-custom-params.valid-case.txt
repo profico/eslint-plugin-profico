@@ -1,0 +1,75 @@
+import { Bookmark } from '@app/database/models';
+import {
+  ApiPaginatedResponse,
+  IdPathParams,
+  PaginatedResponseDto,
+  VinifyRequest,
+} from '@app/globals';
+import { AuthenticatedRequest } from '@app/security/guard/interfaces/authenticated-request.interface';
+import { JwtGuard } from '@app/security/guard/jwt.guard';
+import { VerifiedUserGuard } from '@app/security/guard/verified-user.guard';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Param,
+  Post,
+  Query,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
+import { ApiCreatedResponse, ApiExtraModels, ApiTags } from '@nestjs/swagger';
+
+import { ReadBookmarksQueryParams } from '../query-params/read-bookmarks.query-params';
+import { CreateBookmarkDto } from '../dto/create-bookmark.dto';
+import { ReadBookmarkDto } from '../dto/read-dto/read-bookmark.dto';
+import { CreateBookmarksService } from '../services/create-bookmarks.service';
+import { DeleteBookmarksService } from '../services/delete-bookmarks.service';
+import { ReadBookmarksService } from '../services/read-bookmarks.service';
+import { BookmarkOwnerGuard } from '../guards/bookmark-owner.guard';
+import { Custom1, Custom2 } from 'customdecs';
+
+@UseGuards(JwtGuard, VerifiedUserGuard)
+@ApiTags('Bookmarks')
+@ApiExtraModels(ReadBookmarkDto)
+@Controller('bookmarks')
+export class BookmarksController {
+  constructor(
+    private readonly readBookmarksService: ReadBookmarksService,
+    private readonly createBookmarksService: CreateBookmarksService,
+    private readonly deleteBookmarksService: DeleteBookmarksService,
+  ) {}
+
+  @Get()
+  @ApiPaginatedResponse(ReadBookmarkDto)
+  public findAll(
+    @Query() queryParams: ReadBookmarksQueryParams,
+    @Req() req: VinifyRequest,
+    @Custom1() hehe: Hehe,
+    @Custom2() huehue: Huehue,
+  ): Promise<PaginatedResponseDto<ReadBookmarkDto>> {
+    return this.readBookmarksService.find(queryParams, req, req.lang);
+  }
+
+  /**
+   * @todo Missing response documentation. Can't reuse ReadBookmarkDto.
+   */
+  @Post()
+  @ApiCreatedResponse()
+  public create(
+    @Body() values: CreateBookmarkDto,
+    @Req() { user }: AuthenticatedRequest,
+  ): Promise<Bookmark> {
+    return this.createBookmarksService.create(values, user.id);
+  }
+
+  @UseGuards(BookmarkOwnerGuard)
+  @Delete(':id')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  public delete(@Param() { id }: IdPathParams): Promise<void> {
+    return this.deleteBookmarksService.delete(id);
+  }
+}

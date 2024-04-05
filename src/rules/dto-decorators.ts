@@ -1,26 +1,8 @@
 import { Rule, SourceCode } from "eslint";
 import { ClassDeclaration, Program, Node } from "estree";
 import { findImportsByPackageName } from "../utils/imports";
-
-interface ProficoNodeBodyElement {
-  decorators?: ProficoDecorator[];
-  type: "PropertyDefinition";
-}
-
-interface ProficoDecorator {
-  expression: {
-    callee: {
-      name: string;
-    };
-  };
-  type: "Decorator";
-  range: number[];
-  loc: {
-    start: {
-      column: number;
-    };
-  };
-}
+import { ProficoDecorator } from "../interfaces/profico-decorator.interface";
+import { ProficoNodeBodyElement } from "../interfaces/profico-node-body-element.interface";
 
 const IS_OPTIONAL = "IsOptional";
 
@@ -161,7 +143,9 @@ const dtoDecorators: Rule.RuleModule = {
         }
 
         for (let i = 0; i < classBody.length; i++) {
-          const classNodeBodyElement = classBody[i] as ProficoNodeBodyElement;
+          const classNodeBodyElement = classBody[
+            i
+          ] as unknown as ProficoNodeBodyElement;
 
           if (
             classNodeBodyElement.type !== "PropertyDefinition" ||

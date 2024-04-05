@@ -4,6 +4,7 @@ const nest: Linter.Config = {
   extends: ["plugin:@profi.co/recommended"],
   rules: {
     "@profi.co/dto-decorators": ["error"],
+    "@profi.co/ordered-controller-params": ["error"],
     "import/no-unresolved": "off",
     "import/no-extraneous-dependencies": [
       "error",

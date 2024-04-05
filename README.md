@@ -31,7 +31,8 @@ To use the recommended rules, add our plugin to your `.eslintrc` file:
   "rules": {
     "@profi.co/lodash-imports": ["error"],
     "@profi.co/grouped-imports": ["error"],
-    "@profi.co/dto-decorators": ["error"]
+    "@profi.co/dto-decorators": ["error"],
+    "@profi.co/ordered-controllers-params": ["error"]
   }
 }
 ```
@@ -62,8 +63,6 @@ import pick from "lodash/pick";
 
 ### <a name="dto-decorators">dto-decorators</a>
 
-- [x] Default import lodash modules instead of importing the whole library or parts of it:
-
 ```tsx
 // Bad
 @IsString()
@@ -74,6 +73,30 @@ public classProperty: string;
 @ApiProperty()
 @IsString()
 public classProperty: string;
+```
+
+### <a name="ordered-controller-params">ordered-controller-params</a>
+
+```tsx
+// Bad
+public findAll(
+  @Req() req: VinifyRequest,
+  @Query() queryParams: ReadBookmarksQueryParams,
+  @Custom2() huehue: Huehue,
+  @Custom1() hehe: Hehe,
+): Promise<PaginatedResponseDto<ReadBookmarkDto>> {
+  return this.readBookmarksService.find(queryParams, req, req.lang);
+}
+
+// Good
+public findAll(
+  @Query() queryParams: ReadBookmarksQueryParams,
+  @Req() req: VinifyRequest,
+  @Custom1() hehe: Hehe,
+  @Custom2() huehue: Huehue,
+): Promise<PaginatedResponseDto<ReadBookmarkDto>> {
+  return this.readBookmarksService.find(queryParams, req, req.lang);
+}
 ```
 
 <br />
