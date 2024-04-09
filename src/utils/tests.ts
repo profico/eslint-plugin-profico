@@ -1,7 +1,7 @@
 import fs from "fs";
 import path from "path";
 
-export function readAllFilesInDir(
+export function readAllTxtFilesInDir(
   dir: string,
   filenamesToIgnore: string[] = [],
 ): string[] {
