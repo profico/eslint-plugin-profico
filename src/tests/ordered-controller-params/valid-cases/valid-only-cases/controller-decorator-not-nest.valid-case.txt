@@ -1,0 +1,49 @@
+import {
+  QueryParams,
+  ProficoRequest,
+  CustomParam,
+  ValuesDto,
+  PathParams,
+  Controller,
+} from '@app/globals';
+import {
+  Body,
+  Delete,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Param,
+  Post,
+  Query,
+  Req,
+} from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
+
+@ApiTags('Profico test')
+@Controller('profico-tests')
+export class TestController {
+  constructor(
+    private readonly service: Service,
+  ) {}
+
+  @Get()
+  public findAll(
+    @Req() req: ProficoRequest,
+    @Query() queryParams: QueryParams,
+  ) {
+    return this.service.find();
+  }
+
+  @Post()
+  public create(
+    @Body() values: ValuesDto,
+    @Req() { user }: ProficoRequest,
+  ) {
+    return this.service.create(values, user.id);
+  }
+
+  @Delete(':id')
+  public delete(@Param() { id }: PathParams) {
+    return this.service.delete(id);
+  }
+}

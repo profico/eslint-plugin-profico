@@ -1,7 +1,7 @@
 import fs from "fs";
 import path from "path";
 
-export function readAllFilesInDir(
+export function readAllTxtFilesInDir(
   dir: string,
   filenamesToIgnore: string[] = [],
 ): string[] {
@@ -12,6 +12,8 @@ export function readAllFilesInDir(
       filename => !filenamesToIgnore.includes(filename),
     );
   }
+
+  allFilenames = allFilenames.filter(el => el.endsWith(".txt"));
 
   return allFilenames.map(filename =>
     fs.readFileSync(path.join(dir, filename)).toString().trim(),

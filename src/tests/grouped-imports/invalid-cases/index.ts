@@ -1,5 +1,5 @@
 import path from "path";
 
-import { readAllFilesInDir } from "../../../utils/tests";
+import { readAllTxtFilesInDir } from "../../../utils/tests";
 
-export default readAllFilesInDir(path.join(__dirname, "."), ["index.ts"]);
+export default readAllTxtFilesInDir(path.join(__dirname, "."), ["index.ts"]);
