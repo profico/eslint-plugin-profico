@@ -119,6 +119,14 @@ const recommended: Linter.Config = {
     "padding-line-between-statements": ["off"],
     quotes: ["off"],
   },
+  overrides: [
+    {
+      files: ["*.ts", "*.mts", "*.cts", "*.tsx"],
+      rules: {
+        "no-undef": "off",
+      },
+    },
+  ],
 };
 
 export default recommended;
