@@ -3,13 +3,16 @@ import { RuleTester } from "eslint";
 import lodashImports from "../rules/lodash-imports";
 
 const tester = new RuleTester({
-  parserOptions: {
-    sourceType: "module",
-    ecmaVersion: 2015,
+  languageOptions: {
+    parser: require("@typescript-eslint/parser"),
+    parserOptions: {
+      sourceType: "module",
+      ecmaVersion: 2015,
+    },
   },
 });
 
-tester.run("lodash-imports", lodashImports, {
+tester.run("profico/lodash-imports", lodashImports, {
   valid: [
     "import pick from 'lodash/pick';",
     "import pick from 'lodash/pick';\n\"import get from 'lodash/get';\"",

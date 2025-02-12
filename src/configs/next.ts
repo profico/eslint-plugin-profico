@@ -1,8 +1,21 @@
 import { Linter } from "eslint";
+import recommended from "./recommended";
+import nextConfig from "eslint-config-next";
 
 const next: Linter.Config = {
-  extends: ["next/core-web-vitals", "plugin:@profi.co/recommended"],
+  files: ["**/*.{js,jsx,ts,tsx}"],
+  ...recommended(),
+  languageOptions: {
+    parserOptions: {
+      ecmaVersion: "latest",
+      sourceType: "module",
+    },
+    globals: {
+      browser: true,
+    },
+  },
   rules: {
+    ...nextConfig,
     "import/no-extraneous-dependencies": [
       "error",
       {
@@ -12,9 +25,6 @@ const next: Linter.Config = {
         ],
       },
     ],
-  },
-  env: {
-    browser: true,
   },
 };
 

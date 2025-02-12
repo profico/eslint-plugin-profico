@@ -1,25 +1,40 @@
-import { Linter, Rule } from "eslint";
+import { Linter } from "eslint";
 
-import recommendedConfig from "./configs/recommended";
 import nestConfig from "./configs/nest";
 import nextConfig from "./configs/next";
 import reactConfig from "./configs/react";
 
-import lodashImports from "./rules/lodash-imports";
-import groupedImports from "./rules/grouped-imports";
-import dtoDecorators from "./rules/dto-decorators";
-import orderedControllerParams from "./rules/ordered-controller-params";
+import { getConfigs, getRules } from "./utils/linter-config";
 
-export const rules: Record<string, Rule.RuleModule> = {
-  "lodash-imports": lodashImports,
-  "grouped-imports": groupedImports,
-  "dto-decorators": dtoDecorators,
-  "ordered-controller-params": orderedControllerParams,
-};
+export const rules = getRules();
 
-export const configs: Record<string, Linter.Config> = {
-  recommended: recommendedConfig,
-  nest: nestConfig,
-  next: nextConfig,
-  react: reactConfig,
-};
+export const configs = getConfigs();
+
+// Convert existing configs to flat config format
+export function recommended(): Linter.Config[] {
+  return [
+    {
+      plugins: {
+        profico: {
+          rules: getRules(true),
+        },
+      },
+      rules: {
+        "profico/lodash-imports": "error",
+        "profico/grouped-imports": "error",
+      },
+    },
+  ];
+}
+
+export function next(): Linter.Config[] {
+  return [...recommended(), nextConfig];
+}
+
+export function react(): Linter.Config[] {
+  return [...recommended(), reactConfig];
+}
+
+export function nest(): Linter.Config[] {
+  return [...recommended(), nestConfig];
+}

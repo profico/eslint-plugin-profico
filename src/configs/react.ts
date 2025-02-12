@@ -1,27 +1,32 @@
 import { Linter } from "eslint";
+import reactHooksPlugin from "eslint-plugin-react-hooks";
+import recommended from "./recommended";
 
 const react: Linter.Config = {
-  env: {
-    browser: true,
+  files: ["**/*.{js,jsx,ts,tsx}"],
+  ...recommended(),
+  languageOptions: {
+    parserOptions: {
+      ecmaFeatures: {
+        jsx: true,
+        modules: true,
+      },
+    },
+    globals: {
+      NodeJS: "readonly",
+      React: "readonly",
+      JSX: "readonly",
+      browser: true,
+    },
   },
-  extends: ["airbnb", "plugin:@profi.co/recommended"],
-  plugins: ["react-hooks"],
+  plugins: {
+    "react-hooks": reactHooksPlugin,
+  },
   settings: {
     react: {
       version: "detect",
       pragma: "React",
     },
-  },
-  parserOptions: {
-    ecmaFeatures: {
-      jsx: true,
-      modules: true,
-    },
-  },
-  globals: {
-    NodeJS: "readonly",
-    React: "readonly",
-    JSX: "readonly",
   },
   rules: {
     "global-require": ["off"],

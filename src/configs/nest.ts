@@ -1,37 +1,24 @@
 import { Linter } from "eslint";
+import recommended from "./recommended";
 
-const nest: Linter.Config = {
-  extends: ["plugin:@profi.co/recommended"],
+const nestConfig: Linter.Config = {
+  files: ["**/*.{js,jsx,ts,tsx}"],
+  ...recommended(),
+  languageOptions: {
+    parserOptions: {
+      ecmaVersion: "latest",
+      sourceType: "module",
+    },
+  },
   rules: {
     "@profi.co/dto-decorators": ["error"],
     "@profi.co/ordered-controller-params": ["error"],
     "import/no-unresolved": "off",
-    "import/no-extraneous-dependencies": [
-      "error",
-      {
-        devDependencies: true,
-      },
-    ],
+    "import/no-extraneous-dependencies": ["error", { devDependencies: false }],
     "no-useless-constructor": "off",
     "no-empty-function": "off",
-    "no-unused-vars": [
-      "error",
-      {
-        vars: "all",
-        args: "none",
-        ignoreRestSiblings: true,
-        varsIgnorePattern: "^[A-Z].*",
-      },
-    ],
+    "no-unused-vars": ["error", { argsIgnorePattern: "^_" }],
   },
-  overrides: [
-    {
-      files: ["**/*spec.ts"],
-      env: {
-        jest: true,
-      },
-    },
-  ],
 };
 
-export default nest;
+export default nestConfig;

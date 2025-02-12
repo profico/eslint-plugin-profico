@@ -1,25 +1,29 @@
 import { Linter } from "eslint";
+import * as tseslint from "@typescript-eslint/eslint-plugin";
+import * as tsparser from "@typescript-eslint/parser";
+import prettier from "eslint-config-prettier";
+import importPlugin from "eslint-plugin-import";
+import { getConfigs, getRules } from "../utils/linter-config";
 
-const recommended: Linter.Config = {
-  plugins: ["@profi.co"],
-  parserOptions: {
-    ecmaVersion: 2015,
-    sourceType: "module",
+const recommended = (): Linter.Config => ({
+  files: ["**/*.{js,jsx,ts,tsx}"],
+  languageOptions: {
+    parser: tsparser,
+    parserOptions: {
+      ecmaVersion: 2015,
+      sourceType: "module",
+    },
+    globals: {
+      NodeJS: "readonly",
+    },
   },
-  env: {
-    node: true,
-  },
-  parser: "@typescript-eslint/parser",
-  extends: [
-    "airbnb-base",
-    "plugin:@typescript-eslint/recommended",
-    "plugin:prettier/recommended",
-    "plugin:import/errors",
-    "plugin:import/warnings",
-    "plugin:import/typescript",
-  ],
-  globals: {
-    NodeJS: "readonly",
+  plugins: {
+    "@typescript-eslint": tseslint,
+    "@profi.co": {
+      rules: getRules(),
+      configs: getConfigs(),
+    },
+    import: importPlugin,
   },
   settings: {
     "import/resolver": {
@@ -33,6 +37,12 @@ const recommended: Linter.Config = {
     },
   },
   rules: {
+    ...tseslint.configs.recommended.rules,
+    ...prettier.rules,
+    ...importPlugin.configs.errors.rules,
+    ...importPlugin.configs.warnings.rules,
+    ...importPlugin.configs.typescript.rules,
+
     "@profi.co/lodash-imports": ["error"],
     "@profi.co/grouped-imports": ["error"],
     "@typescript-eslint/ban-ts-comment": ["off"],
@@ -119,14 +129,6 @@ const recommended: Linter.Config = {
     "padding-line-between-statements": ["off"],
     quotes: ["off"],
   },
-  overrides: [
-    {
-      files: ["*.ts", "*.mts", "*.cts", "*.tsx"],
-      rules: {
-        "no-undef": "off",
-      },
-    },
-  ],
-};
+});
 
 export default recommended;
