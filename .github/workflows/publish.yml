@@ -19,6 +19,6 @@ jobs:
       - name: Prepare package for publishing
         run: pnpm run prepublish
       - name: Publish package
-        run: pnpm run publish --access public
+        run: pnpm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
