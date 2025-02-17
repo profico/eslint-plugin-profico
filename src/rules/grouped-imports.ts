@@ -14,7 +14,7 @@ const groupedImports: Rule.RuleModule = {
       url: "https://github.com/profico/eslint-plugin-profico#grouped-imports",
     },
   },
-  create: context => {
+  create(context) {
     return {
       Program: ({ body }) => {
         if (!hasImports(body)) {

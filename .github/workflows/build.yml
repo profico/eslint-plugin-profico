@@ -8,7 +8,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [18.14]
+        node-version: [22.14]
 
     steps:
       - uses: actions/checkout@v3
@@ -16,13 +16,16 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 9
       - name: Install dependencies
-        run: yarn --frozen-lockfile
+        run: pnpm install --frozen-lockfile
       - name: Format check
-        run: yarn format:check
+        run: pnpm run format:check
       - name: Unit Testing
-        run: yarn test
+        run: pnpm run test
         env:
           CI: true
       - name: Production build
-        run: yarn build
+        run: pnpm run build

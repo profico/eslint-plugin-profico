@@ -7,7 +7,9 @@ import validCases from "./valid-cases";
 import validOnlyCases from "./valid-cases/valid-only-cases";
 
 const tester = new RuleTester({
-  parser: require.resolve("@typescript-eslint/parser"),
+  languageOptions: {
+    parser: require("@typescript-eslint/parser"),
+  },
 });
 
 tester.run("ordered-controller-params", orderedControllerParams, {

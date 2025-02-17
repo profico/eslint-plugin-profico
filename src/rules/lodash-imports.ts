@@ -20,44 +20,46 @@ const lodashImports: Rule.RuleModule = {
       url: "https://github.com/profico/eslint-plugin-profico#lodash-imports",
     },
   },
-  create: context => ({
-    ImportDeclaration: node => {
-      const { source, specifiers, loc } = node;
+  create(context) {
+    return {
+      ImportDeclaration: node => {
+        const { source, specifiers, loc } = node;
 
-      if (source.value !== "lodash") {
-        return null;
-      }
+        if (source.value !== "lodash") {
+          return null;
+        }
 
-      if (isNamespaceImport(node) || isDefaultImport(node)) {
-        context.report({
-          node,
-          messageId: "noUnderscoreImport",
-        });
-      }
+        if (isNamespaceImport(node) || isDefaultImport(node)) {
+          context.report({
+            node,
+            messageId: "noUnderscoreImport",
+          });
+        }
 
-      if (hasNamedImports(node)) {
-        context.report({
-          node,
-          loc: loc || {
-            start: { column: 0, line: 0 },
-            end: { column: 0, line: 0 },
-          },
-          messageId: "invalidImport",
-          fix: fixer =>
-            fixer.replaceText(
-              node,
-              specifiers
-                .map(spec =>
-                  spec.type === "ImportSpecifier"
-                    ? `import ${spec.local.name} from 'lodash/${spec.local.name}';`
-                    : `import ${spec.local.name} from 'lodash';`,
-                )
-                .join("\n"),
-            ),
-        });
-      }
-    },
-  }),
+        if (hasNamedImports(node)) {
+          context.report({
+            node,
+            loc: loc || {
+              start: { column: 0, line: 0 },
+              end: { column: 0, line: 0 },
+            },
+            messageId: "invalidImport",
+            fix: fixer =>
+              fixer.replaceText(
+                node,
+                specifiers
+                  .map(spec =>
+                    spec.type === "ImportSpecifier"
+                      ? `import ${spec.local.name} from 'lodash/${spec.local.name}';`
+                      : `import ${spec.local.name} from 'lodash';`,
+                  )
+                  .join("\n"),
+              ),
+          });
+        }
+      },
+    };
+  },
 };
 
 export default lodashImports;

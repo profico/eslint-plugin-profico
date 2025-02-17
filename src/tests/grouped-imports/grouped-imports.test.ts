@@ -6,13 +6,16 @@ import invalidCases from "./invalid-cases";
 import validCases from "./valid-cases";
 
 const tester = new RuleTester({
-  parserOptions: {
-    sourceType: "module",
-    ecmaVersion: 2015,
+  languageOptions: {
+    parser: require("@typescript-eslint/parser"),
+    parserOptions: {
+      sourceType: "module",
+      ecmaVersion: 2015,
+    },
   },
 });
 
-tester.run("grouped-imports", groupedImports, {
+tester.run("profico/grouped-imports", groupedImports, {
   valid: validCases,
   invalid: invalidCases.map<RuleTester.InvalidTestCase>((code, index) => ({
     code,
