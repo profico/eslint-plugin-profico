@@ -8,6 +8,8 @@ import {
   Node,
   Statement,
 } from "estree";
+import { TSESTree } from "@typescript-eslint/utils";
+import type { SourceCode } from "eslint";
 
 type GroupedImportsResult = {
   start: number;
@@ -237,4 +239,220 @@ export function findImportsByPackageName(
   });
 
   return importedSet;
+}
+
+// Type imports utility functions (for type-imports rule)
+export function isTypeImportDeclaration(
+  importNode: TSESTree.ImportDeclaration,
+  sourceCode: SourceCode,
+): boolean {
+  const specifiers = importNode.specifiers.filter(
+    (spec): spec is TSESTree.ImportSpecifier => spec.type === "ImportSpecifier",
+  );
+
+  const hasTypeSpecifiers = specifiers.some(spec => spec.importKind === "type");
+
+  // Check if it's a pure type import (starts with "import type")
+  const sourceText = sourceCode.getText(importNode);
+  const isPureTypeImport = /^\s*import\s+type\b/.test(sourceText);
+
+  return isPureTypeImport || hasTypeSpecifiers;
+}
+
+export function isValueImportDeclaration(
+  importNode: TSESTree.ImportDeclaration,
+): boolean {
+  const specifiers = importNode.specifiers.filter(
+    (spec): spec is TSESTree.ImportSpecifier => spec.type === "ImportSpecifier",
+  );
+
+  const hasValueSpecifiers = specifiers.some(
+    spec => spec.importKind !== "type",
+  );
+
+  // Default imports or namespace imports go with value imports
+  const hasDefaultOrNamespace = importNode.specifiers.some(
+    spec =>
+      spec.type === "ImportDefaultSpecifier" ||
+      spec.type === "ImportNamespaceSpecifier",
+  );
+
+  return hasValueSpecifiers || hasDefaultOrNamespace || specifiers.length === 0;
+}
+
+export function separateImportsByType(
+  imports: TSESTree.ImportDeclaration[],
+  sourceCode: SourceCode,
+): {
+  valueImports: TSESTree.ImportDeclaration[];
+  typeImports: TSESTree.ImportDeclaration[];
+} {
+  const valueImports: TSESTree.ImportDeclaration[] = [];
+  const typeImports: TSESTree.ImportDeclaration[] = [];
+
+  imports.forEach(importNode => {
+    if (isTypeImportDeclaration(importNode, sourceCode)) {
+      typeImports.push(importNode);
+    } else if (isValueImportDeclaration(importNode)) {
+      valueImports.push(importNode);
+    } else {
+      // Default case: treat as value import
+      valueImports.push(importNode);
+    }
+  });
+
+  return { valueImports, typeImports };
+}
+
+export function areImportsInterleaved(
+  valueImports: TSESTree.ImportDeclaration[],
+  typeImports: TSESTree.ImportDeclaration[],
+): boolean {
+  if (valueImports.length === 0 || typeImports.length === 0) {
+    return false;
+  }
+
+  // Sort imports by their position in the source code
+  const allImports = [...valueImports, ...typeImports].sort(
+    (a, b) => a.range![0] - b.range![0],
+  );
+
+  // Optimize membership checks using a Set
+  const typeSet = new Set(typeImports);
+
+  // Check if type and value imports are interleaved
+  let foundType = false;
+  for (const importNode of allImports) {
+    const isTypeImport = typeSet.has(importNode);
+
+    if (isTypeImport) {
+      foundType = true;
+    } else if (foundType) {
+      // Found a value import after a type import - they're interleaved
+      return true;
+    }
+  }
+
+  return false;
+}
+
+// Sort each group alphabetically by source, then by original position for stability
+const sortBySource = (
+  a: TSESTree.ImportDeclaration,
+  b: TSESTree.ImportDeclaration,
+) => {
+  const sourceA = a.source.value?.toString() || "";
+  const sourceB = b.source.value?.toString() || "";
+  const bySource = sourceA.localeCompare(sourceB);
+  if (bySource !== 0) return bySource;
+  return (a.range?.[0] ?? 0) - (b.range?.[0] ?? 0);
+};
+
+export function sortImportsByType(
+  imports: TSESTree.ImportDeclaration[],
+): TSESTree.ImportDeclaration[] {
+  const namespaceImports: TSESTree.ImportDeclaration[] = [];
+  const defaultImports: TSESTree.ImportDeclaration[] = [];
+  const namedImports: TSESTree.ImportDeclaration[] = [];
+
+  imports.forEach(imp => {
+    const hasNamespaceImport = imp.specifiers.some(
+      spec => spec.type === "ImportNamespaceSpecifier",
+    );
+    const hasDefaultImport = imp.specifiers.some(
+      spec => spec.type === "ImportDefaultSpecifier",
+    );
+    const hasNamedImports = imp.specifiers.some(
+      spec => spec.type === "ImportSpecifier",
+    );
+
+    if (hasNamespaceImport) {
+      namespaceImports.push(imp);
+    } else if (hasDefaultImport && !hasNamedImports) {
+      defaultImports.push(imp);
+    } else {
+      namedImports.push(imp);
+    }
+  });
+
+  return [
+    ...namespaceImports.sort(sortBySource),
+    ...defaultImports.sort(sortBySource),
+    ...namedImports.sort(sortBySource),
+  ];
+}
+
+export function generateFixedImportsText(
+  valueImports: TSESTree.ImportDeclaration[],
+  typeImports: TSESTree.ImportDeclaration[],
+  sourceCode: SourceCode,
+): string {
+  const sortedValueImports = sortImportsByType(valueImports);
+  const sortedTypeImports = sortImportsByType(typeImports);
+
+  const valueImportsText = sortedValueImports
+    .map(imp => sourceCode.getText(imp))
+    .join("\n");
+  const typeImportsText = sortedTypeImports
+    .map(imp => sourceCode.getText(imp))
+    .join("\n");
+
+  return valueImportsText + "\n\n" + typeImportsText;
+}
+
+export function getImportRange(
+  imports: TSESTree.ImportDeclaration[],
+): [number, number] {
+  const startIndex = Math.min(...imports.map(imp => imp.range![0]));
+  const endIndex = Math.max(...imports.map(imp => imp.range![1]));
+  return [startIndex, endIndex];
+}
+
+export function categorizeImports(imports: TSESTree.ImportDeclaration[]): {
+  absoluteImports: TSESTree.ImportDeclaration[];
+  relativeImports: TSESTree.ImportDeclaration[];
+} {
+  const absoluteImports: TSESTree.ImportDeclaration[] = [];
+  const relativeImports: TSESTree.ImportDeclaration[] = [];
+
+  imports.forEach(importNode => {
+    if (isRelativeImport(importNode)) {
+      relativeImports.push(importNode);
+    } else {
+      absoluteImports.push(importNode);
+    }
+  });
+
+  return { absoluteImports, relativeImports };
+}
+
+export function processImportGroup(
+  imports: TSESTree.ImportDeclaration[],
+  context: Rule.RuleContext,
+) {
+  if (imports.length === 0) return;
+
+  const { valueImports, typeImports } = separateImportsByType(
+    imports,
+    context.sourceCode,
+  );
+
+  if (areImportsInterleaved(valueImports, typeImports)) {
+    const firstTypeImport = typeImports[0];
+    context.report({
+      node: firstTypeImport,
+      messageId: "mixedTypeValueImports",
+      fix: fixer => {
+        const allImports = [...valueImports, ...typeImports];
+        const [startIndex, endIndex] = getImportRange(allImports);
+        const replacement = generateFixedImportsText(
+          valueImports,
+          typeImports,
+          context.sourceCode,
+        );
+
+        return fixer.replaceTextRange([startIndex, endIndex], replacement);
+      },
+    });
+  }
 }

@@ -2,6 +2,7 @@ import { Linter, Rule } from "eslint";
 
 import lodashImports from "../rules/lodash-imports";
 import groupedImports from "../rules/grouped-imports";
+import typeImports from "../rules/type-imports";
 import recommendedConfig from "../configs/recommended";
 import nestConfig from "../configs/nest";
 import nextConfig from "../configs/next";
@@ -12,6 +13,7 @@ import orderedControllerParams from "../rules/ordered-controller-params";
 type RegularRulesNames =
   | "lodash-imports"
   | "grouped-imports"
+  | "type-imports"
   | "dto-decorators"
   | "ordered-controller-params";
 type FlatRulesNames = `profico/${RegularRulesNames}`;
@@ -29,6 +31,7 @@ export function getRules(
     return {
       "profico/lodash-imports": lodashImports,
       "profico/grouped-imports": groupedImports,
+      "profico/type-imports": typeImports,
       "profico/dto-decorators": dtoDecorators,
       "profico/ordered-controller-params": orderedControllerParams,
     };
@@ -37,6 +40,7 @@ export function getRules(
   return {
     "lodash-imports": lodashImports,
     "grouped-imports": groupedImports,
+    "type-imports": typeImports,
     "dto-decorators": dtoDecorators,
     "ordered-controller-params": orderedControllerParams,
   };

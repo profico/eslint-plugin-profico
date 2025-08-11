@@ -1,0 +1,22 @@
+import AddNicknameDialogHeader from 'components/SvgIcons/AddNicknameDialogHeader';
+import colors from 'styles/themes/colors';
+import useBreakpoint from 'utils/hooks/useBreakpoint';
+import useToggleState from 'utils/hooks/useToggleState';
+import fetch from 'utils/static/fetchRelative';
+import { Grid, Button, Typography } from '@mui/material';
+import Form, { FormProps, FormSubmitHandler } from 'components/Forms/Form';
+import React, { useState } from 'react';
+import { PostNicknameData } from 'types/User';
+
+import type * as ReactTypes from 'react';
+import type Lalalal from 'lalala/lalalal';
+import { type Kokos } from 'kokos/kokos';
+import { type Kokos } from 'kokos/trokos';
+
+import ConfirmDialog from './ConfirmDialog';
+import NicknameInput from './NicknameInput';
+import SuccessDialog from './SuccessDialog';
+import { something } from './something';
+
+import type PreCoolType from './precooltype';
+import { type barakokula } from './barakokula';
