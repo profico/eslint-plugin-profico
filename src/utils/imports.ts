@@ -250,13 +250,25 @@ export function isTypeImportDeclaration(
     (spec): spec is TSESTree.ImportSpecifier => spec.type === "ImportSpecifier",
   );
 
+  if (importNode.importKind === "type") {
+    return true;
+  }
+
   const hasTypeSpecifiers = specifiers.some(spec => spec.importKind === "type");
+
+  if (hasTypeSpecifiers) {
+    return true;
+  }
 
   // Check if it's a pure type import (starts with "import type")
   const sourceText = sourceCode.getText(importNode);
   const isPureTypeImport = /^\s*import\s+type\b/.test(sourceText);
 
-  return isPureTypeImport || hasTypeSpecifiers;
+  if (isPureTypeImport) {
+    return true;
+  }
+
+  return false;
 }
 
 export function isValueImportDeclaration(
@@ -266,9 +278,17 @@ export function isValueImportDeclaration(
     (spec): spec is TSESTree.ImportSpecifier => spec.type === "ImportSpecifier",
   );
 
+  if (importNode.importKind === "value") {
+    return true;
+  }
+
   const hasValueSpecifiers = specifiers.some(
     spec => spec.importKind !== "type",
   );
+
+  if (hasValueSpecifiers) {
+    return true;
+  }
 
   // Default imports or namespace imports go with value imports
   const hasDefaultOrNamespace = importNode.specifiers.some(
@@ -277,7 +297,15 @@ export function isValueImportDeclaration(
       spec.type === "ImportNamespaceSpecifier",
   );
 
-  return hasValueSpecifiers || hasDefaultOrNamespace || specifiers.length === 0;
+  if (hasDefaultOrNamespace) {
+    return true;
+  }
+
+  if (specifiers.length === 0) {
+    return true;
+  }
+
+  return false;
 }
 
 export function separateImportsByType(
@@ -397,6 +425,7 @@ export function generateFixedImportsText(
     .map(imp => sourceCode.getText(imp))
     .join("\n");
 
+  // Add single blank line between value and type imports
   return valueImportsText + "\n\n" + typeImportsText;
 }
 
@@ -429,6 +458,7 @@ export function categorizeImports(imports: TSESTree.ImportDeclaration[]): {
 export function processImportGroup(
   imports: TSESTree.ImportDeclaration[],
   context: Rule.RuleContext,
+  needsTrailingNewline = false,
 ) {
   if (imports.length === 0) return;
 
@@ -451,7 +481,12 @@ export function processImportGroup(
           context.sourceCode,
         );
 
-        return fixer.replaceTextRange([startIndex, endIndex], replacement);
+        // Add trailing newline if this group is followed by other imports
+        const finalReplacement = needsTrailingNewline
+          ? replacement + "\n"
+          : replacement;
+
+        return fixer.replaceTextRange([startIndex, endIndex], finalReplacement);
       },
     });
   }

@@ -29,9 +29,14 @@ const typeImports: Rule.RuleModule = {
         const { absoluteImports, relativeImports } =
           categorizeImports(importNodes);
 
-        // Process each group
-        processImportGroup(absoluteImports, context);
-        processImportGroup(relativeImports, context);
+        // Process absolute imports (may need trailing newline if relative imports exist)
+        processImportGroup(
+          absoluteImports,
+          context,
+          relativeImports.length > 0,
+        );
+        // Process relative imports (never needs trailing newline as it's the last group)
+        processImportGroup(relativeImports, context, false);
       },
     };
   },

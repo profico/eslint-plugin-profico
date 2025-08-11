@@ -12,10 +12,13 @@ import { type Kokos } from 'kokos/kokos';
 import { Grid, Button, Typography } from '@mui/material';
 import { PostNicknameData } from 'types/User';
 import { type Kokos } from 'kokos/trokos';
+import type NekiNoviType from './precooltyNekiNoviTypepe';
 
 import NicknameInput from './NicknameInput';
 import type PreCoolType from './precooltype';
 import SuccessDialog from './SuccessDialog';
 import ConfirmDialog from './ConfirmDialog';
 import { something } from './something';
-import { type barakokula } from './barakokula';
+import { type barakokula, someValue } from './barakokula';
+
+

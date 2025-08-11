@@ -18,5 +18,6 @@ import NicknameInput from './NicknameInput';
 import SuccessDialog from './SuccessDialog';
 import { something } from './something';
 
+import type NekiNoviType from './precooltyNekiNoviTypepe';
 import type PreCoolType from './precooltype';
-import { type barakokula } from './barakokula';
+import { type barakokula, someValue } from './barakokula';
